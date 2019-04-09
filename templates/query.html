@@ -1,0 +1,27 @@
+{% extends "top.html" %}
+
+{% block body %}
+<br><br>
+<form name="frm" method="post" action="{{ request.path }}">
+    Selecione a Base:
+    <select name="ds_base" id="ds_base" required>
+        <option value="">BASE</option>
+        {{sel_base|safe}}
+    </select>
+    <br>
+    Query:<br>
+    <textarea name="query" id="query" rows="15" placeholder="Somente SELECT" required>{{query}}</textarea><br>
+    <input type="submit" name="bt" value="Enviar">
+</form>
+<br>
+{% for category, message in get_flashed_messages(with_categories = true) %}
+    <p style="color: red;font-weight:bold">Erro: {{ message }}</p>
+{% endfor %}
+    
+Resultado:<br>
+
+{% for row in tables %}
+    {{ row|safe }}
+{% endfor %}
+
+{% endblock %}

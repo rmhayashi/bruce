@@ -1,0 +1,69 @@
+{% extends "top.html" %}
+
+{% block body %}
+<script>
+    function valida_login(act,mat){
+        if (mat){
+            opcoes('/valida_login','dv',{acao:act,matricula:mat});
+        }
+    }
+
+    function conf_excluir(mat,nom){
+        if(confirm("Deseja realmente excluir "+ nom)){
+            opcoes('/valida_login','dv',{acao:'excluir',matricula:mat});
+        }
+    }
+</script>
+<div class="container">
+    <div class="box">
+        <form name="frm" method="post" action="{{ request.path }}">
+            <table>
+                <tr>
+                    <td style="width:80px">Matrícula:</td>
+                    <td><input type="text" name="matricula" id="matricula" onkeyup="filtra(0,this.value)" onblur="valida_login('select',this.value)" autofocus required></td>
+                </tr>
+                <tr>
+                    <td>Nome:</td>
+                    <td><input type="text" name="nome" id="nome" required></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center">
+                        <input type="submit" name="bt" value="Cadastrar">
+                        &nbsp;&nbsp;&nbsp;
+                        <input type="button" name="bt2" value="Voltar" onclick="window.location.href='/'">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center" id="dv">&nbsp;</td>
+                </tr>
+            </table>
+        </form>
+        <br>
+        {% for category, message in get_flashed_messages(with_categories = true) %}
+            <div class="alerta">
+                {{ message }}
+            </div>
+        {% endfor %}
+        
+    </div>
+</div>
+<table class="rel" id="tbfiltro" style="width:60%">
+    <thead>
+        <tr>
+            <th>Matrícula</th>
+            <th>Nome</th>
+            <th>Excluir</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for usr in usrs %}
+            <tr>
+                <td>{{ usr.matricula }}</td>
+                <td>{{ usr.nome }}</td>
+                <td style="text-align:center;color:red;font-size:12px;cursor:pointer;" title="Excluir {{ usr.nome }}" onclick="conf_excluir('{{ usr.matricula }}','{{ usr.nome }}');">X</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

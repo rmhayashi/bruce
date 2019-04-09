@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bruce Lee</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='estilos.css') }}">
+    <script type=text/javascript src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+
+<script>
+    function confirma(){
+        if (document.getElementById("nova_senha").value != document.getElementById("nova_senha2").value){
+            alert("Confirmação de Senha inválida!");
+            return false;
+        }else{
+            return true;
+        }
+    };
+</script>
+
+<div class="container">
+    <div class="box">
+        <form name="frm" method="post" action="{{ url_for('login') }}" {% if fl %} onsubmit="return confirma()" {% endif %}>
+            <table>
+                <tr>
+                    <td style="width:100px">Matrícula:</td>
+                    <td><input type="text" name="matricula" id="matricula" value="{{matricula}}" autofocus required></td>
+                </tr>
+                <tr>
+                    <td>Senha:</td>
+                    <td><input type="password" name="senha" id="senha" value="{{senha}}" required></td>
+                </tr>
+            {% if fl %}
+                {% set alt_senha = fl %}
+                <tr>
+                    <td nowrap>Nova Senha:</td>
+                    <td>
+                        <input type="password" name="nova_senha" id="nova_senha" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td nowrap>Confirmar Senha:</td>
+                    <td>
+                        <input type="password" name="nova_senha2" id="nova_senha2" required>
+                        <script>
+                            document.getElementById('nova_senha').focus();
+                        </script>
+                    </td>
+                </tr>
+            {% endif %}
+                <tr>
+                    <td colspan="2">
+                        {% for category, message in get_flashed_messages(with_categories = true) %}
+                            <div class="alerta">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td colspan="2" style="text-align:center"><br>
+                        <input type="hidden" name="alt_senha" value="{{ alt_senha }}">
+                        <input type="submit" name="bt" value="Login">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

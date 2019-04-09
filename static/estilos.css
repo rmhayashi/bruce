@@ -1,0 +1,90 @@
+input[type=text], textarea, input[type=password]{
+	width: 98%;
+}
+
+input[type=submit],input[type=button]{
+	background-color: black;
+	color: white;
+	border-radius: 8px;
+	
+	min-width: 100px;
+	transition: 0.3s;
+}
+
+input[type=submit]:hover,input[type=button]:hover {
+	background-color: white;
+	color: black;
+	cursor: pointer;
+	font-weight: bold;
+	box-shadow: 0 3px 20px 5px rgba(253, 253, 253, 0.2), 0 6px 20px 0 rgba(255, 255, 255, 0.19);
+  }
+
+html { 
+	background: url(bruce.jpg) no-repeat center fixed; 
+	background-size: cover;
+  }
+
+body {
+	color: white;
+	background-color: black;
+	margin: 0px;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: 12px;
+}
+
+.container {
+	width: 100vw;
+	height: 30vh;
+	background: url(bruce.jpg) no-repeat center fixed; 
+	background-size: cover;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center
+}
+
+.box {
+	width: 400px;
+	background: black;
+	justify-content: center;
+}
+
+.alerta {
+	color: red;
+	font-size: 14px;
+	text-align: center;
+}
+
+table {
+	width: 100%;
+	margin-left:auto; 
+	margin-right:auto;
+	padding:2px;
+	border-spacing: 0px;
+}
+
+th {
+	background-color: rgba(220, 175, 48);
+	border: 1px black solid;
+	text-align: center;
+}
+
+.rel td{
+	border: 1px white solid;
+	border-spacing: 0px;
+	padding: 5px;
+}
+
+.rel tr:nth-child(even){
+	background-color: rgba(220, 175, 48);
+}
+
+a {
+	color: white;
+	font-size: 14px;
+	text-decoration: none;
+}
+
+a:hover {
+	color: rgba(220, 175, 48);
+}
