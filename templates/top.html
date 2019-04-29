@@ -21,7 +21,7 @@
     <table>
         <tr>
             <td style="width:20%; text-align:center"><a href="{{ url_for('main') }}">SAIR</a></td>
-            <td style="width:20%; text-align:center"><a href="{{ url_for('query.index') }}">QUERY</a></td>
+            <td style="width:20%; text-align:center"><a href="{{ url_for('query') }}">QUERY</a></td>
             <td style="text-align:center"><a href="{{ url_for('performance.index') }}">PERFORMANCE</a></td>
             {% if session['matricula'] in ('80656720','80479177') %}
                 <td style="width:20%; text-align:center"><a href="{{ url_for('novo') }}">USUÁRIOS</a></td>

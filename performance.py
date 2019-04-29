@@ -29,6 +29,8 @@ def index():
 
         # graf_analista_acumulado = grafanalista_acumulado(session['matricula'],mes)
         graf_analista_acumulado = grafanalista_acumulado(matricula,mes)
+        graf_analista_mes = grafanalista_mes(matricula,mes)
+        graf_analista_formulario = grafanalista_formulario(matricula,mes)
 
     while dt_fim > dt_ini:
         if str(mes) == str(dt_fim.month) + '/' + str(dt_fim.year):

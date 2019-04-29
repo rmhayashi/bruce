@@ -56,10 +56,10 @@
         <td id="graf_analista_acumulado" style="height:475px;"></td>
     </tr>
     <tr>
-        <td id="grafanalista_mes" style="height:475px;"></td>
+        <td id="graf_analista_mes" style="height:475px;"></td>
     </tr>
     <tr>
-        <td id="grafanalista_formulario" style="height:475px;"></td>
+        <td id="graf_analista_formulario" style="height:475px;"></td>
     </tr>
 </table>
 <script>
@@ -94,6 +94,16 @@
     {% if graf_analista_acumulado %}
         var graf_analista_acumulado = {{graf_analista_acumulado | safe}};
         Plotly.plot('graf_analista_acumulado',graf_analista_acumulado,{});
+    {% endif %}
+
+    {% if graf_analista_mes %}
+        var graf_analista_mes = {{graf_analista_mes | safe}};
+        Plotly.plot('graf_analista_mes',graf_analista_mes,{});
+    {% endif %}
+
+    {% if graf_analista_formulario %}
+        var graf_analista_formulario = {{graf_analista_formulario | safe}};
+        Plotly.plot('graf_analista_formulario',graf_analista_formulario,{});
     {% endif %}
 </script>
 {% endblock %}

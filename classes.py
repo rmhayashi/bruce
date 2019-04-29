@@ -8,6 +8,9 @@ import io
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 import pandas as pd, json, numpy as np
 import plotly, plotly.graph_objs as go
 
@@ -19,13 +22,12 @@ from query import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'hashsometHingthatcantberepliedneVer'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bruce.sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bases/bruce.sqlite3'
 app.config['PERMANENT_SESSION_LIFETIME'] = 1200 #tempo em segundos
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.register_blueprint(performance)
-app.register_blueprint(query)
 
 db = SQLAlchemy(app)
 

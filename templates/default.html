@@ -18,6 +18,18 @@
             return true;
         }
     };
+
+    function esqueceu_senha(){
+        var mat = document.getElementById("matricula").value;
+        if (mat == ""){
+            alert("Favor digite sua matrícula");
+            document.getElementById("matricula").focus();
+        }else{
+            document.frm_esq.matricula.value = mat;
+            document.frm_esq.senha.value = mat;
+            document.frm_esq.submit();
+        }
+    }
 </script>
 
 <div class="container">
@@ -64,9 +76,22 @@
                     <td colspan="2" style="text-align:center"><br>
                         <input type="hidden" name="alt_senha" value="{{ alt_senha }}">
                         <input type="submit" name="bt" value="Login">
+                        {% if not fl %}
+                            <br><br>
+                            <a onclick="esqueceu_senha()" style="font-size:10px;cursor:pointer">Esqueci minha Senha</a>
+                        {% endif %}
                     </td>
                 </tr>
             </table>
         </form>
     </div>
 </div>
+<form name="frm_esq" method="POST" action="{{ url_for('login') }}">
+    <input type="hidden" name="matricula" id="matricula2">
+    <input type="hidden" name="senha" id="senha2">
+</form>
+{% if fl %}
+    <script>
+        document.getElementById("nova_senha").focus();
+    </script>
+{% endif %}
