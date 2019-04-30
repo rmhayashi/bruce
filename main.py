@@ -171,4 +171,4 @@ def query():
 
 if __name__ == "__main__":
     db.create_all()
-    app.run(debug=True, use_reloader=True,port=80,host='0.0.0.0')
+    app.run(debug=True, use_reloader=True,port=5000,host='0.0.0.0')

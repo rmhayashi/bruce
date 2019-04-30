@@ -17,16 +17,13 @@ def carrega_bases():
     nform = pd.read_csv('bases/formularios.csv',sep=';',encoding='cp1252',low_memory=False);
     df_equipe = pd.read_csv('bases/'+ arquivo_equipe,sep=';',encoding='cp1252',low_memory=False);
     df_equipe = df_equipe.sort_values('nome')
-
     df_acumulado = pd.read_csv('bases/acumulado.csv',sep=';',encoding='utf8',low_memory=False,
-                                names=['persid','incidente','ordem','open_date','resolve_date',
-                                    'dia_abertura','dia_fechamento','sla_violation','dt_sla','dia_sla',
-                                    'analista','grupo_abertura','grupo_final','operacao_abertura','operacao_final',
-                                    'formulario','fl_status','ds_status'])  
+                                    names=['persid','incidente','ordem','open_date','resolve_date',
+                                        'dia_abertura','dia_fechamento','sla_violation','dt_sla','dia_sla',
+                                        'analista','grupo_abertura','grupo_final','operacao_abertura','operacao_final',
+                                        'formulario','fl_status','ds_status'])  
     lg_acumulado = pd.read_csv('bases/acumulado_log.csv',sep=';',encoding='utf8',low_memory=False,
                     names=['incidente','fl_log','ds_log','analista','dt_log','dia_log']);
-
-    df_acumulado = df_acumulado.sort_values('open_date')
 
     df_acumulado['analista'] = df_acumulado['analista'].str.upper()
     lg_acumulado['analista'] = lg_acumulado['analista'].str.upper()
@@ -42,7 +39,9 @@ def carrega_bases():
     df_acumulado['mes_fechamento'].fillna(0,inplace=True)
     df_acumulado['ano_fechamento'].fillna(0,inplace=True)
     df_acumulado['mes_ano_fechamento'] = df_acumulado['mes_fechamento'].map(int).map(str) + '/' + \
-                                         df_acumulado['ano_fechamento'].map(int).map(str)
+                                        df_acumulado['ano_fechamento'].map(int).map(str)
+
+    df_acumulado['dia_fechamento'] = pd.DatetimeIndex(pd.to_datetime(df_acumulado['resolve_date'],format='%Y-%m-%d %H:%M:%S')).day
 
     lg_acumulado['mes'] = pd.DatetimeIndex(pd.to_datetime(lg_acumulado['dt_log'],format='%Y-%m-%d %H:%M:%S')).month
     lg_acumulado['ano'] = pd.DatetimeIndex(pd.to_datetime(lg_acumulado['dt_log'],format='%Y-%m-%d %H:%M:%S')).year
@@ -223,9 +222,8 @@ def dia_base():
     hoje = dt.date(hoje.year, hoje.month,hoje.day)
 
     if hoje > ultimo_dia:
-        # global msg
         msg = atu_base(hoje,ultimo_dia)
-        df_acumulado, lg_acumulado, ultimo_dia, lg_escalonados, df_equipe = carrega_bases()
+        df_acumulado, lg_acumulado, ultimo_dia, lg_escalonados, df_equipe, nform = carrega_bases()
 
     return df_acumulado, lg_acumulado, ultimo_dia, hoje 
 
@@ -872,20 +870,22 @@ def grafanalista_mes(matricula,mes):
         ope_pri = operacao.split(', ')[0]
         meta_pc = 100 / df_analistas[(df_analistas['operacao_analista'].str.find(ope_pri) >= 0)].count()['matricula']
         
-        df = df_acumulado[(df_acumulado['mes_ano_fechamento'] == str(mes))].sort_values(['dia_fechamento'])
+        df = df_acumulado[(df_acumulado['mes_ano_fechamento'] == str(mes))]
         df = pd.merge(df,df_analistas,left_on='analista',right_on='nome')
 
         lg_analista_esc = lg_escalonados[(lg_escalonados['mes_ano'] == str(mes)) & (lg_escalonados['analista'] == nome)]
+        
+        dias_fechamento = sorted(df['dia_fechamento'].unique())
 
         mdf = []
-        for x in df['dia_fechamento'].unique():
+        for x in dias_fechamento:
             media_fechados = df[(df['dia_fechamento'] == x) 
                     & (df['operacao_final'].isin(operacao.split(', '))) 
                     & (df['matricula'].isin(df[(df['operacao_analista'].str.find(ope_pri) >= 0)]['matricula']))
-                ].groupby(['dia_fechamento','nome']).count()['incidente'].mean()
+                ].groupby(['nome']).count()['incidente'].mean()
             mdf.append('{:,.2f}'.format(media_fechados))
 
-        df = df[(df['matricula'] == matricula)]
+        df = df[(df['matricula'] == matricula)].sort_values('dia_fechamento')
 
         fechado = df[(df['escalonado'] == 0)].groupby(['dia_fechamento']).count()['incidente']
         total_fechado = df[(df['escalonado'] == 0)].count()['incidente']
@@ -905,26 +905,11 @@ def grafanalista_mes(matricula,mes):
         movimentados = movimentados['qtf'] + movimentados['qte']
         total_movimentados = total_fechado + total_escalonados
 
-        movimentado = go.Scatter(
-            x = df['dia_fechamento'].unique(),
-            y = movimentados.loc[df['dia_fechamento'].unique()],
-            name = 'Movimentados - '+ '{:,}'.format(total_movimentados).replace(',','.'),
-            marker = dict(
-                color = 'yellow',
-                size = 8,
-                line = dict(
-                    color='black',
-                    width = 1)
-                ),
-            line = dict(
-                color='yellow',
-                width = 4,
-                ),
-        )
+        
 
         fechado = go.Bar(
-            x = df['dia_fechamento'].unique(),
-            y = fechado.loc[df['dia_fechamento'].unique()],
+            x = dias_fechamento,
+            y = fechado.loc[dias_fechamento],
             name='Fechados - '+ '{:,}'.format(total_fechado).replace(',','.'),
             width = 0.6,
             marker = dict(
@@ -936,25 +921,25 @@ def grafanalista_mes(matricula,mes):
         )
 
         media_f = go.Scatter(
-            x = df['dia_fechamento'].unique(),
+            x = dias_fechamento,
             y = mdf,
             name='Média Fechados '+ operacao,
             marker = dict(
-                color = 'lightgreen'
+                color = 'yellow'
                 ),
             line = dict(
-                color='lightgreen',
+                color='yellow',
                 width = 3,
                 ),
         )
 
         if total_escalonados > 0:
             escalonado = go.Bar(
-                x = df['dia_fechamento'].unique(),
-                y = escalonados.loc[df['dia_fechamento'].unique()],
+                x = dias_fechamento,
+                y = escalonados.loc[dias_fechamento],
                 name = 'Escalonados - '+ '{:,}'.format(total_escalonados).replace(',','.')
                     + ' - {:,.1%}'.format(total_escalonados/total_fechado),
-                width = 0.5,
+                width = 0.6,
                 marker = dict(
                     color = 'silver',
                     line = dict(
@@ -966,8 +951,8 @@ def grafanalista_mes(matricula,mes):
 
         if total_violados > 0:
             violado = go.Bar(
-                x = df['dia_fechamento'].unique(),
-                y = violados.loc[df['dia_fechamento'].unique()],
+                x = dias_fechamento,
+                y = violados.loc[dias_fechamento],
                 name = 'Violados - '+ str(total_violados) 
                     + ' - {:,.1%}'.format(total_violados/total_fechado),
                 width = 0.4,
@@ -982,11 +967,11 @@ def grafanalista_mes(matricula,mes):
 
         if total_reabertos > 0:
             reaberto = go.Bar(
-                x = df['dia_fechamento'].unique(),
-                y = reabertos.loc[df['dia_fechamento'].unique()],
+                x = dias_fechamento,
+                y = reabertos.loc[dias_fechamento],
                 name = 'Reabertos - '+ str(total_reabertos) 
                     + ' - {:,.1%}'.format(total_reabertos/total_fechado),
-                width = 0.3,
+                width = 0.4,
                 marker = dict(
                     color = 'black',
                     line = dict(
@@ -996,7 +981,7 @@ def grafanalista_mes(matricula,mes):
             )
 
         layout = go.Layout(
-            barmode = 'overlay', 
+            barmode = 'stack', 
             title = nome + ' - '+ mes,
             xaxis = dict(
                 tickmode='linear'
@@ -1041,64 +1026,62 @@ def grafanalista_mes(matricula,mes):
 
 ###############################################################################################
 def grafanalista_formulario(matricula,mes):
-# try:
-    hoje = dt.datetime.now()
-    ano = str(hoje.year)
-    if mes == '':
-        mes = str(hoje.month)
-        mes = mes +'/'+ ano
-    arquivo = ('0' + mes.replace('/',''))[-6:]
-    arquivo = arquivo[-2:] + arquivo[:2]
-    arquivo = 'equipe_'+ arquivo + '.csv'
+    try:
+        hoje = dt.datetime.now()
+        ano = str(hoje.year)
+        if mes == '':
+            mes = str(hoje.month)
+            mes = mes +'/'+ ano
+        arquivo = ('0' + mes.replace('/',''))[-6:]
+        arquivo = arquivo[-2:] + arquivo[:2]
+        arquivo = 'equipe_'+ arquivo + '.csv'
 
-    df_analistas = pd.read_csv('bases/'+ arquivo,sep=';',encoding='cp1252',low_memory=False);
-    nome = df_analistas[df_analistas['matricula'] == matricula]['nome'].iloc[0]
-    
-    df = df_acumulado[(df_acumulado['mes_ano_fechamento'] == str(mes)) 
-        & (df_acumulado['analista'] == nome)].sort_values(['dia_fechamento'])
+        df_analistas = pd.read_csv('bases/'+ arquivo,sep=';',encoding='cp1252',low_memory=False);
+        nome = df_analistas[df_analistas['matricula'] == matricula]['nome'].iloc[0]
+        
+        df = df_acumulado[(df_acumulado['mes_ano_fechamento'] == str(mes)) 
+            & (df_acumulado['analista'] == nome)].sort_values(['dia_fechamento'])
 
-    fm = pd.merge(df,nform,on='formulario',how='left')
-    fm['dificuldade'].fillna('ND',inplace=True)
-    fm = fm.sort_values('dificuldade')
+        fm = pd.merge(df,nform,on='formulario',how='left')
+        fm['dificuldade'].fillna('ND',inplace=True)
+        fm = fm.sort_values('dificuldade')
 
-    data = []
-    tamanho = 0.8
-    for x in fm['dificuldade'].unique():
-        formulario = fm[fm['dificuldade'] == x].groupby(['dia_fechamento']).count()['incidente']
-        formulario = go.Bar(
-            width = tamanho,
-            x = fm['dia_fechamento'].unique(),
-            y = formulario.loc[fm['dia_fechamento'].unique()],
-            name = x,
-        )
-        data.append(formulario)
-        tamanho -= 0.15
+        data = []
+        tamanho = 0.8
+        for x in fm['dificuldade'].unique():
+            formulario = fm[fm['dificuldade'] == x].groupby(['dia_fechamento']).count()['incidente']
+            formulario = go.Bar(
+                width = tamanho,
+                x = sorted(fm['dia_fechamento'].unique()),
+                y = formulario.loc[sorted(fm['dia_fechamento'].unique())],
+                name = x,
+            )
+            data.append(formulario)
+            # tamanho -= 0.15
 
-    layout = go.Layout(
-        barmode = 'overlay', 
-        title = nome + ' - '+ mes,
-        xaxis = dict(
-            tickmode='linear'
-        ),
-        yaxis = dict(
-            title = 'Qtde'
-        ),
-        legend=dict(orientation="h",
-            x=0,
-            font=dict(
-                family='verdana',
-                size=10,
-                color='#000'
+        layout = go.Layout(
+            barmode = 'stack', 
+            title = nome + ' - '+ mes,
+            xaxis = dict(
+                tickmode='linear'
+            ),
+            yaxis = dict(
+                title = 'Qtde'
+            ),
+            legend=dict(orientation="h",
+                x=0,
+                font=dict(
+                    family='verdana',
+                    size=10,
+                    color='#000'
+                )
             )
         )
-    )
 
-    
+        fig = go.Figure(data=data, layout=layout)
 
-    fig = go.Figure(data=data, layout=layout)
-
-    graf = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-    return graf
-# except Exception as e:
-#     flash(e)
-#     return ''
+        graf = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+        return graf
+    except Exception as e:
+        flash(e)
+        return ''
