@@ -191,7 +191,7 @@ def queries():
                         resultado = df_o
                         tables=[df_o.to_html(classes='rel')]
 
-                        logs = tlog(session['matricula'], x + ' ['+ qry + ']', dt.datetime.now(), session['ip'])
+                        logs = tlog(session['matricula'], bse + ' ['+ qry + ']', dt.datetime.now(), session['ip'])
                         db.session.add(logs)
 
                         return render_template("queries.html", **locals())
