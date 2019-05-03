@@ -18,6 +18,7 @@ from dataframes import *
 from defs import *
 from performance import *
 from query import *
+from queryBuilder import *
 
 
 app = Flask(__name__)

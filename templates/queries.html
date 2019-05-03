@@ -1,0 +1,36 @@
+{% extends "top.html" %}
+
+{% block body %}
+<br><br>
+<center>
+<form name="frmQry" method="post" action="{{ request.path }}">
+    Selecione a query:
+        <select name="query" id="query" required>
+            <optgroup label="Siebel 8">
+                <option value="idsDoc">IDs por Doc</option>
+                <option value="idsOrdem">IDs por Ordem</option>
+                <option value="ordemInst">Ordem pela instância</option>
+                <option value="cxAtv">CXLOG atividade</option>
+                <option value="cxIns1">CXLOG instância-1</option>
+                <option value="cxIns2">CXLOG instância-2</option>
+            </optgroup>
+        </select>
+    <input type="text" name="campo" id="campo" required>
+    <input type="submit" name="btnBuscar" value="Buscar">
+</form>
+<br>
+Resultado:
+</center>
+<br>
+<br>
+{% for category, message in get_flashed_messages(with_categories = true) %}
+    <p style="color: red;font-weight:bold">Erro: {{ message }}</p>
+{% endfor %}
+    
+Resultado:<br>
+
+{% for row in tables %}
+    {{ row|safe }}
+{% endfor %}
+
+{% endblock %}
