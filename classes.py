@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, url_for, session, app, Response, Blueprint
+from flask import Flask, render_template, request, flash, url_for, session, app, Response, Blueprint, current_app, g
 import cx_Oracle #, threading
 from flask_sqlalchemy import SQLAlchemy
 import datetime as dt, pyodbc, time
@@ -18,7 +18,6 @@ from dataframes import *
 from defs import *
 from performance import *
 from query import *
-from queryBuilder import *
 
 
 app = Flask(__name__)

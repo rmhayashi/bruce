@@ -169,37 +169,39 @@ def query():
 
     return render_template("query.html", sel_base = sel_base)
 
-@queries.route("/queries",methods=['GET', 'POST'])
-def queries():
-        query = req("query")
-        campo = req("campo")
-        if request.method == 'POST':
-                pd.set_option('display.max_colwidth', -1)
-                b = builder(query,campo)
-                qry = str (b[0])
-                bse = str (b[1])
-                df = pd.read_csv('bases/bases_oracle.csv',sep=';')
-                for x, y in df[['base','conexao']].values:
-                    if x == bse:
-                        conexao = y
-                        pass
-                    else:
-                        pass
-                try:
-                        conn_oracle = cx_Oracle.connect(conexao)
-                        df_o = pd.read_sql(qry, conn_oracle)
-                        resultado = df_o
-                        tables=[df_o.to_html(classes='rel')]
 
-                        logs = tlog(session['matricula'], bse + ' ['+ qry + ']', dt.datetime.now(), session['ip'])
-                        db.session.add(logs)
 
-                        return render_template("queries.html", **locals())
+@app.route("/consultas",methods=['GET', 'POST'])
+def consultas():
+    query = req("query")
+    campo = str(req("campo")).replace(";","").strip()
+    if request.method == 'POST':
+        pd.set_option('display.max_colwidth', -1)
+        b = builder(query,campo)
+        qry = str (b[0])
+        bse = str (b[1])
+        df = pd.read_csv('bases/bases_oracle.csv',sep=';')
+        for x, y in df[['base','conexao']].values:
+            if x == bse:
+                    conexao = y
+                    pass
+            else:
+                    pass
+        try:
+            conn_oracle = cx_Oracle.connect(conexao)
+            df_o = pd.read_sql(qry, conn_oracle)
+            resultado = df_o
+            tables=[df_o.to_html(classes='rel')]
 
-                except Exception as e:
-                        flash(e)
-                        return render_template("queries.html", campo = campo)
-        return render_template("queries.html") 
+            logs = tlog(session['matricula'], bse + ' ['+ qry + ']', dt.datetime.now(), session['ip'])
+            db.session.add(logs)
+
+            return render_template("queries.html", **locals())
+
+        except Exception as e:
+                flash(e)
+                return render_template("queries.html", campo = campo)
+    return render_template("queries.html") 
 
 if __name__ == "__main__":
     db.create_all()
