@@ -12,8 +12,10 @@
                 <option value="idsOrdem" {% if query == "idsOrdem" %} selected {% endif %}>IDs por Ordem</option>
                 <option value="ordemInst" {% if query == "ordemInst" %} selected {% endif %}>Ordem pela instância</option>
                 <option value="cxAtv" {% if query == "cxAtv" %} selected {% endif %}>CXLOG atividade</option>
-                <option value="cxIns1" {% if query == "cxIns1" %} selected {% endif %}>CXLOG instância-1</option>
-                <option value="cxIns2" {% if query == "cxIns2" %} selected {% endif %}>CXLOG instância-2</option>
+                <option value="cxIns1" {% if query == "cxIns1" %} selected {% endif %}>CXLOG instância - 1</option>
+                <option value="cxIns2" {% if query == "cxIns2" %} selected {% endif %}>CXLOG instância - 2</option>
+                <option value="risco" {% if query == "risco" %} selected {% endif %}>Nível de risco</option>
+                <option value="idProd" {% if query == "idProd" %} selected {% endif %}>ID produto</option>
             </optgroup>
         </select>
     <textarea name="campo" id="campo" rows="5" placeholder="Insira o parâmetro" required>{{campo}}</textarea>
