@@ -230,7 +230,7 @@ def dia_base():
 
 df_acumulado, lg_acumulado, ultimo_dia, lg_escalonados, df_equipe, nform = carrega_bases()
 
-df_acumulado, lg_acumulado, ultimo_dia, hoje  = dia_base()
+# df_acumulado, lg_acumulado, ultimo_dia, hoje  = dia_base()
    
 ###############################################################################################
 def graf_geral():

@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, flash, url_for, session, app, Response, Blueprint, current_app, g
+from flask import Flask, render_template, request, flash, url_for, session, app, Response, Blueprint
 import cx_Oracle #, threading
 from flask_sqlalchemy import SQLAlchemy
+
 import datetime as dt, pyodbc, time
 import hashlib
 from dateutil.relativedelta import *
