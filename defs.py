@@ -66,7 +66,7 @@ def builder(query, campo):
                                 AND e.X_ACCOUNT_ID = c.ROW_ID
                                 order by i.created desc""").format(campo), "SIEBEL"
     elif query == 'cxAtv':
-        return ("""Select *
+        return ("""Select ROW_ID, PROCESS_NAME, PROCESS_TYPE,LOGGED_MESSAGE_LONG erro_ao_gerar_atividade
                                 FROM SIEBEL.CX_LOGGING
                                 where object_id = (select row_id from siebel.s_order where integration_id = '{}')""").format(campo), "SIEBEL"
     elif query == 'cxIns1':
@@ -80,3 +80,9 @@ def builder(query, campo):
                                 AND CREATED = (SELECT MAX(CREATED) FROM SIEBEL.CX_LOGGING WHERE OBJECT_ID = CX.OBJECT_ID
                                                 And Log_Level = 'WEB SERVICE EXCEPTION')
                                 And Object_Id = '{}'""").format(campo), "SIEBEL"
+    elif query == 'risco':
+        return ("""SELECT X_CREDIT_SCORE Nivel_de_risco, X_CREDIT_FLG FROM SIEBEL.S_ADDR_PER
+                                where X_ACCOUNT_ID = '{}'""").format(campo), "SIEBEL"
+    elif query == 'idProd':
+        return ("""select name, row_id from siebel.s_prod_int
+                                where name like '%{}%'""").format(campo), "SIEBEL"
