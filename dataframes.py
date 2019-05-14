@@ -222,7 +222,7 @@ def dia_base():
     hoje = dt.date(hoje.year, hoje.month,hoje.day)
 
     if hoje > ultimo_dia:
-        msg = atu_base(hoje,ultimo_dia)
+        # msg = atu_base(hoje,ultimo_dia)
         df_acumulado, lg_acumulado, ultimo_dia, lg_escalonados, df_equipe, nform = carrega_bases()
 
     return df_acumulado, lg_acumulado, ultimo_dia, hoje 

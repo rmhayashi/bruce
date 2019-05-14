@@ -9,7 +9,7 @@ def index():
         return render_template("top.html"), 200
 
     global df_acumulado, lg_acumulado, ultimo_dia, msg, hoje, df_equipe
-    df_acumulado, lg_acumulado, ultimo_dia, hoje = dia_base()
+    # df_acumulado, lg_acumulado, ultimo_dia, hoje = dia_base()
     dt_ini = dt.datetime.strptime('01/10/2018','%d/%m/%Y')
     dt_fim = dt.datetime.now()
     sel_mes = ''
