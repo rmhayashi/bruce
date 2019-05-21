@@ -18,7 +18,6 @@ import plotly, plotly.graph_objs as go
 from dataframes import *
 from defs import *
 from performance import *
-from query import *
 
 
 app = Flask(__name__)
