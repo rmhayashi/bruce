@@ -59,6 +59,8 @@ def novo():
         session['logado'] = False
         return render_template("top.html"), 200
 
+    funcao_menu = 'Controle de Usuários'
+
     if request.method == 'POST':
         user = usuario(req('matricula'),req('nome'),req('matricula'))
         db.session.add(user)
@@ -75,6 +77,8 @@ def logs():
     if not 'logado' in session:
         session['logado'] = False
         return render_template("top.html"), 200
+
+    funcao_menu = 'Log de Acessos e Consultas'
 
     dt1 = dt.datetime.now().date()
     dt2 = dt.datetime.now().date()
@@ -128,6 +132,12 @@ def valida_login():
 
 @app.route("/query",methods=['GET', 'POST'])
 def query():
+    if not 'logado' in session:
+        session['logado'] = False
+        return render_template("top.html"), 200
+
+    funcao_menu = 'Consultas Construídas pelo Usuário'
+
     sel = ''
     sel_base = ''
 
@@ -149,7 +159,7 @@ def query():
         
         if query[0:6].upper() != 'SELECT':
             flash('NÃO É POSSÍVEL EXECUTAR')
-            return render_template("query.html", sel_base = sel_base, query = query)
+            return render_template("query.html", **locals())
         else:
             try:
                 conn_oracle = cx_Oracle.connect(conexao)
@@ -165,14 +175,20 @@ def query():
 
             except Exception as e:
                 flash(e)
-                return render_template("query.html", query = query, sel_base = sel_base)
+                return render_template("query.html", **locals())
 
-    return render_template("query.html", sel_base = sel_base)
+    return render_template("query.html", **locals())
 
 
 
 @app.route("/consultas",methods=['GET', 'POST'])
 def consultas():
+    if not 'logado' in session:
+        session['logado'] = False
+        return render_template("top.html"), 200
+
+    funcao_menu = 'Consultas Pré-Construídas'
+
     ds_tipo = req('ds_tipo')
     ds_campo = str(req('ds_campo')).replace(";","").strip()
 
@@ -197,7 +213,7 @@ def consultas():
         except Exception as e:
                 flash(e)
                 return render_template("queries.html", **locals())
-    return render_template("queries.html", sel_base = sel_base, ds_campo = '')
+    return render_template("queries.html", sel_base = sel_base, ds_campo = '', funcao_menu = funcao_menu)
 
 
 if __name__ == "__main__":

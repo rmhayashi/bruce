@@ -8,6 +8,8 @@ def index():
         session['logado'] = False
         return render_template("top.html"), 200
 
+    funcao_menu = 'Performance'
+
     global df_acumulado, lg_acumulado, ultimo_dia, msg, hoje, df_equipe
     # df_acumulado, lg_acumulado, ultimo_dia, hoje = dia_base()
     dt_ini = dt.datetime.strptime('01/10/2018','%d/%m/%Y')

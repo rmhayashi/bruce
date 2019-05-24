@@ -1,5 +1,5 @@
 bruce.sqlite3
 bases
-__pycache__
+__pycache__/
 bruce.ipynb
 *.pyc
