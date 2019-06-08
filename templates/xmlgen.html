@@ -1,0 +1,26 @@
+{% extends "top.html" %}
+
+{% block body %}
+<br><br>
+<form name="form" method="post" action="{{ request.path }}">
+    Tipo de operacao:
+    <select name="op_type" id="op_type" required>
+        <option value="1">OPERACAO</option>
+        {{sel_op|safe}}
+    </select>
+    <br>
+    Ordem:
+	<input type="text" id="txt_order" name="txt_order" placeholder="Ordem">
+    <input type="submit" name="btn" value="Enviar">
+</form>
+<br>
+
+<textarea id = "res_xml" cols="5" rows="20" name= "res_xml">
+{{result|safe}}
+</textarea>
+
+{% for category, message in get_flashed_messages(with_categories = true) %}
+    <p style="color: red;font-weight:bold">Erro: {{ message }}</p>
+{% endfor %}
+
+{%endblock%}
