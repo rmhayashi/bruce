@@ -41,76 +41,58 @@ def gerar_xml():
 
     if request.method == "POST":
         try:
-            # # Conexao com o banco de dados Oracle
-            # # DEVE-SE PREENCHER OS CAMPOS LOGIN E SENHA DAS BASES
-            #
-            # conn_pweb = cx_Oracle.connect('LOGIN/SENHA@(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = vippweb1)(PORT = 1521)) (CONNECT_DATA =   (SERVER = DEDICATED)   (SERVICE_NAME = svcpweb) ))')
-            # conn_sieb8 = cx_Oracle.connect('LOGIN/@SENHA@(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = vippsie8appl)(PORT = 1521)) (CONNECT_DATA =   (SERVER = DEDICATED) (SERVICE_NAME = psie8) ))')
-            #
-            # # DEVE-SE ADICIONAR OS CAMPOS TECNOLOGIA, GERABA, TIPO_ORDEM & DDD DA TABELA DO SIEBEL8
-            #
-            # querys8 = (
-            # 	'''
-            # 	    SELECT sap.x_cnl, asset_integ_id, sap.x_cnl_code, sap.x_street_type, sap.ADDR, sap.x_number,
-            # 	      sap.x_neighborhood, sap.city, sap.state, x_street_code, TECNOLOGIA, GERABA, TIPO_ORDEM, DDD
-            #         from siebel.s_order so,
-            #         siebel.s_order_item soi,
-            #         siebel.s_prod_int spi,
-            #         siebel.s_org_ext soe,
-            #         siebel.s_addr_per sap
-            #         where so.ROW_ID = soi.ORDER_ID
-            #         and soi.PROD_ID = spi.ROW_ID
-            #         and so.bill_accnt_id = soe.row_id
-            #         and soi.x_serv_addr_id = sap.ROW_ID
-            #         and sap.X_ACCOUNT_ID = soe.ROW_ID
-            #         and soi.PROD_ID in ('1-7HWB','1-5WPB','1-C1SQ','1-F7ISQ')
-            #         and so.INTEGRATION_ID in (''' + txt_order + ''')
-            #         AND spi.name = 'Linha Telefônica';
-            #         ''')
-            #
-            #
-            # querypwb = ('''
-            #     SELECT substr(substr(xml_translate,instr(xml_translate,'</%:serviceId>') -1 ),0,1),
-            #     substr(substr(xml_translate,instr(xml_translate,'</%:serviceId>') -10 ),0,8),
-            #     substr(substr(xml_translate,instr(xml_translate,'</%:telephonicArea>') -2 ),0,2),
-            #     substr(substr(xml_translate,instr(xml_translate,'</%:provisioningCode>') -6 ),0,6),
-            #     substr(substr(xml_translate,instr(xml_translate,'</%:office>') -2 ),0,2),
-            #     substr(substr(xml_translate,instr(xml_translate,'</%:customerOrderType>') -6 ),0,6),
-            #     RESERVA , substr(substr(xml_translate,instr(xml_translate,'</%:mediaType>') -5 ),0,5),
-            #     substr(substr(xml_translate,instr(xml_translate,'</%:serviceId>') -5 ),0,5)
-            #     FROM omanagement_owner.reserves
-            #     WHERE
-            #     reserva IS NOT NULL
-            #     AND   pon IN ("''' + txt_order + '''");
-            #     ''')
-            #
-            #
-            # df_s8 = pd.read_sql(querys8, conn_sieb8)
-            # df_pwb = pd.read_sql(querypwb, conn_pweb)
-            #
-            # for row in df_s8:
-            #     data.append(row)
-            # for row in df_pwb:
-            #     data2.append(row)
-            #
-            # data2.append(txt_order)
+            # Conexao com o banco de dados Oracle
 
-            # TESTE DE ARRAY # DEVE SER APAGADO #
+            conn_pweb = cx_Oracle.connect() # DEVE-SE PREENCHER CONEXÃO
+            conn_sieb8 = cx_Oracle.connect() # DEVE-SE PREENCHER CONEXÃO
 
-            data = ['11000', '0331625300', 'SPO', 'R', 'MENDES JR', '384', 'BRAS', 'SAO PAULO', 'SP', '174017', 'GPON', "SIM", "Mudança de Oferta", "11"]
-            data2 = ['9', '88118848', 'JM', 'VBIG11', 'SJ', 'INSHAB', 'ADSL-12293478', 'FIBRADA', 'VOIP3']
+            # DEVE-SE ADICIONAR OS CAMPOS TECNOLOGIA, GERABA, TIPO_ORDEM & DDD DA TABELA DO SIEBEL8
+
+            querys8 = (
+            	'''
+            	    SELECT sap.x_cnl, asset_integ_id, sap.x_cnl_code, sap.x_street_type, sap.ADDR, sap.x_number,
+            	      sap.x_neighborhood, sap.city, sap.state, x_street_code, TECNOLOGIA, GERABA, TIPO_ORDEM, DDD
+                    from siebel.s_order so,
+                    siebel.s_order_item soi,
+                    siebel.s_prod_int spi,
+                    siebel.s_org_ext soe,
+                    siebel.s_addr_per sap
+                    where so.ROW_ID = soi.ORDER_ID
+                    and soi.PROD_ID = spi.ROW_ID
+                    and so.bill_accnt_id = soe.row_id
+                    and soi.x_serv_addr_id = sap.ROW_ID
+                    and sap.X_ACCOUNT_ID = soe.ROW_ID
+                    and soi.PROD_ID in ('1-7HWB','1-5WPB','1-C1SQ','1-F7ISQ')
+                    and so.INTEGRATION_ID in ("''' + txt_order + '''")
+                    AND spi.name = 'Linha Telefônica';
+                    ''')
+
+
+            querypwb = ('''
+                SELECT substr(substr(xml_translate,instr(xml_translate,'</%:serviceId>') -1 ),0,1),
+                substr(substr(xml_translate,instr(xml_translate,'</%:serviceId>') -10 ),0,8),
+                substr(substr(xml_translate,instr(xml_translate,'</%:telephonicArea>') -2 ),0,2),
+                substr(substr(xml_translate,instr(xml_translate,'</%:provisioningCode>') -6 ),0,6),
+                substr(substr(xml_translate,instr(xml_translate,'</%:office>') -2 ),0,2),
+                substr(substr(xml_translate,instr(xml_translate,'</%:customerOrderType>') -6 ),0,6),
+                RESERVA , substr(substr(xml_translate,instr(xml_translate,'</%:mediaType>') -5 ),0,5),
+                substr(substr(xml_translate,instr(xml_translate,'</%:serviceId>') -5 ),0,5)
+                FROM omanagement_owner.reserves
+                WHERE
+                reserva IS NOT NULL
+                AND   pon IN ("''' + txt_order + '''");
+                ''')
+
+
+            df_s8 = pd.read_sql(querys8, conn_sieb8)
+            df_pwb = pd.read_sql(querypwb, conn_pweb)
+
+            for row in df_s8:
+                data.append(row)
+            for row in df_pwb:
+                data2.append(row)
+
             data2.append(txt_order)
-
-            for row in data:
-                dado.append(row)
-            for row in data2:
-                dado2.append(row)
-
-
-            print dado
-            print dado2
-
-            # FIM DO TESTE DE ARRAY #
 
             # Busca qual será o tipo da ordem no Siebel8 por meio da variável "ot"
             # Busca na sieb8 se a ordem gera ou não BA
