@@ -13,20 +13,12 @@ def gerar_xml():
     operacao = ''
     data = []
     data2 = []
-    dado = []
-    dado2 = []
-
-    # Busca o nome do field do html que a variável irá controlar
 
     op_type = request.form.get("op_type")
     txt_order = request.form.get("txt_order")
 
-    # Realiza a leitura do arquivo operacoes.csv contida no src
-
     df = pd.read_csv('operacoes.csv', sep=';')
     df = df.sort_values(by=['op_type'])
-
-    # Sorteia os valores do arquivo csv para exibir na view
 
     for x, y in df[['op_type', 'operacao']].values:
 
@@ -41,17 +33,13 @@ def gerar_xml():
 
     if request.method == "POST":
         try:
-            # Conexao com o banco de dados Oracle
 
-            conn_pweb = cx_Oracle.connect() # DEVE-SE PREENCHER CONEXÃO
+            conn_pweb = cx_Oracle.connect()  # DEVE-SE PREENCHER CONEXÃO
             conn_sieb8 = cx_Oracle.connect() # DEVE-SE PREENCHER CONEXÃO
 
-            # DEVE-SE ADICIONAR OS CAMPOS TECNOLOGIA, GERABA, TIPO_ORDEM & DDD DA TABELA DO SIEBEL8
-
-            querys8 = (
-            	'''
-            	    SELECT sap.x_cnl, asset_integ_id, sap.x_cnl_code, sap.x_street_type, sap.ADDR, sap.x_number,
-            	      sap.x_neighborhood, sap.city, sap.state, x_street_code, TECNOLOGIA, GERABA, TIPO_ORDEM, DDD
+            querys8 = ("""SELECT sap.x_cnl, asset_integ_id, sap.x_cnl_code, sap.x_street_type, sap.ADDR, sap.x_number,
+                   sap.x_neighborhood, sap.city, sap.state, x_street_code, soi.X_ACCESS_TECHNOLOGY, so.X_GVT_GERA_BA ,x_order_type,
+                      substr(SERVICE_NUM, 0,2)
                     from siebel.s_order so,
                     siebel.s_order_item soi,
                     siebel.s_prod_int spi,
@@ -63,47 +51,64 @@ def gerar_xml():
                     and soi.x_serv_addr_id = sap.ROW_ID
                     and sap.X_ACCOUNT_ID = soe.ROW_ID
                     and soi.PROD_ID in ('1-7HWB','1-5WPB','1-C1SQ','1-F7ISQ')
-                    and so.INTEGRATION_ID in ("''' + txt_order + '''")
-                    AND spi.name = 'Linha Telefônica';
-                    ''')
-
-
-            querypwb = ('''
-                SELECT substr(substr(xml_translate,instr(xml_translate,'</%:serviceId>') -1 ),0,1),
-                substr(substr(xml_translate,instr(xml_translate,'</%:serviceId>') -10 ),0,8),
-                substr(substr(xml_translate,instr(xml_translate,'</%:telephonicArea>') -2 ),0,2),
-                substr(substr(xml_translate,instr(xml_translate,'</%:provisioningCode>') -6 ),0,6),
-                substr(substr(xml_translate,instr(xml_translate,'</%:office>') -2 ),0,2),
-                substr(substr(xml_translate,instr(xml_translate,'</%:customerOrderType>') -6 ),0,6),
-                RESERVA , substr(substr(xml_translate,instr(xml_translate,'</%:mediaType>') -5 ),0,5),
-                substr(substr(xml_translate,instr(xml_translate,'</%:serviceId>') -5 ),0,5)
-                FROM omanagement_owner.reserves
-                WHERE
-                reserva IS NOT NULL
-                AND   pon IN ("''' + txt_order + '''");
-                ''')
-
+                    and so.INTEGRATION_ID in ('{}')
+                    AND spi.name = 'Linha Telefônica';""".format(txt_order))
 
             df_s8 = pd.read_sql(querys8, conn_sieb8)
-            df_pwb = pd.read_sql(querypwb, conn_pweb)
+
+            # Passa os dados do banco para um array
 
             for row in df_s8:
                 data.append(row)
+
+            tecnologia = data[10]
+            geraBA = data[11]
+            ot = data[12]
+
+            # Verifica qual consulta deve ser executada.
+
+            if tecnologia == "METALICO":
+                querypwb = ("""
+                    SELECT substr(substr(xml_translate,instr(xml_translate,'</can:serviceId>') -1 ),0,1),
+                    substr(substr(xml_translate,instr(xml_translate,'</can:serviceId>') -10 ),0,8),
+                    substr(substr(xml_translate,instr(xml_translate,'</can:telephonicArea>') -2 ),0,2),
+                    substr(substr(xml_translate,instr(xml_translate,'</can:provisioningCode>') -6 ),0,6),
+                    substr(substr(xml_translate,instr(xml_translate,'</can:centralOffice>') -2 ),0,2),
+                    substr(substr(xml_translate,instr(xml_translate,'</can:customerOrderType>') -6 ),0,6),
+                    RESERVA , substr(substr(xml_translate,instr(xml_translate,'</can:mediaType>') -4 ),0,4),
+                    substr(substr(xml_translate,instr(xml_translate,'</can:serviceId>') -5 ),0,5)
+                    FROM omanagement_owner.reserves
+                    WHERE
+                    reserva IS NOT NULL
+                    AND   pon IN ('{}')
+                    AND DESIGNADOR LIKE '%013';
+                    """.format(txt_order))
+
+            else:
+                querypwb = ("""
+                    SELECT
+                    substr(substr(xml_translate, instr(xml_translate, '</can:serviceId>') - 1 ), 0, 1),
+                    substr(substr(xml_translate, instr(xml_translate, '</can:serviceId>') - 10), 0, 8),
+                    substr(substr(xml_translate, instr(xml_translate, '</can:telephonicArea>') - 2), 0, 2),
+                    substr(substr(xml_translate, instr(xml_translate, '</can:provisioningCode>') - 6), 0, 6),
+                    substr(substr(xml_translate, instr(xml_translate, '</can:centralOffice>') - 2), 0, 2),
+                    substr(substr(xml_translate, instr(xml_translate, '</can:customerOrderType>') - 6), 0, 6),
+                    RESERVA, substr(substr(xml_translate, instr(xml_translate, '</can:mediaType>') - 5), 0, 5),
+                    substr(substr(xml_translate, instr(xml_translate, '</can:serviceId>') - 5), 0, 5)
+                    FROM omanagement_owner.reserves
+                    WHERE reserva IS NOT NULL
+                    AND pon IN('{}')
+                    AND DESIGNADOR LIKE '%013';
+                    """.format(txt_order))
+
+            df_pwb = pd.read_sql(querypwb, conn_pweb)
+
             for row in df_pwb:
                 data2.append(row)
 
             data2.append(txt_order)
 
-            # Busca qual será o tipo da ordem no Siebel8 por meio da variável "ot"
-            # Busca na sieb8 se a ordem gera ou não BA
-            # Busca a tecnologia da Ordem
-
-            ot = data[12]
-            geraBA = data[11]
-            tecnologia = data[10]
-
-            # Esta linha verifica se deve buscar dados da base da icweb ou preencher com
-            # dados da base sieb8
+            # Verifica se é uma reserva e qual a tecnologia
 
             if tecnologia == "METALICO":
 
@@ -146,8 +151,6 @@ def gerar_xml():
                         operationType = "MUDEND"
                     elif operacao == "res" and ot == "Venda de Oferta":
                         operationType = "INSADI"
-                        data2[1] = "NDS"
-                        data2[0] = "DV"
 
                 else:
 
@@ -155,8 +158,7 @@ def gerar_xml():
                     productTopologyType = data2[7]
                     productTopologyCategory = data2[8]
 
-            # Preenchimento dos parâmetros do shape do XML com dados do Oracle, base
-            # da icweb e sieb8
+            # Preenchimento dos parâmetros do xml a ser gerado
 
             xmlSig = XML(data[0], data[1], data[2], data[3], data[4],
                       data[5], data[6], data[7], data[8], data[9],
@@ -165,8 +167,7 @@ def gerar_xml():
                       operationType, productTopologyType, productTopologyCategory,
                       "N", txt_order)
 
-            # VERIFICA A FUNÇÃO QUE DEVE SER EXECUTADA
-            # POR MEIO DO TIPO DE OPERAÇÃO SELECIONADA
+            # Verifica o tipo de operação selecionada
 
             if operacao == "res":
                 result = xmlSig.sigReserve()
