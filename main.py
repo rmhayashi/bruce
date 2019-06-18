@@ -231,7 +231,9 @@ def gerar_xml():
 
     op_type = request.form.get("op_type")
     txt_order = request.form.get("txt_order")
-
+    
+    pd.set_option('display.max_colwidth', -1)
+    
     df = pd.read_csv('operacoes.csv', sep=';')
     df = df.sort_values(by=['op_type'])
 
