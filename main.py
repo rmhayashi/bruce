@@ -181,31 +181,26 @@ def consultas():
         qry = str (b[0])
         bse = str (b[1])
         df = pd.read_csv('bases/bases_oracle.csv',sep=';')
-        for x, y, exp in df[['base','conexao','exp']].values:
+        for x, y in df[['base','conexao']].values:
             if x == bse:
                     conexao = y
                     pass
             else:
                     pass
-        if exp == 0:
-            try:
-                conn_oracle = cx_Oracle.connect(conexao)
-                df_o = pd.read_sql(qry, conn_oracle)
-                resultado = df_o
-                tables=[df_o.to_html(classes='rel')]
+        try:
+            conn_oracle = cx_Oracle.connect(conexao)
+            df_o = pd.read_sql(qry, conn_oracle)
+            resultado = df_o
+            tables=[df_o.to_html(classes='rel')]
 
-                logs = tlog(session['matricula'], bse + ' ['+ qry + ']', dt.datetime.now(), session['ip'])
-                db.session.add(logs)
+            logs = tlog(session['matricula'], bse + ' ['+ qry + ']', dt.datetime.now(), session['ip'])
+            db.session.add(logs)
 
-                return render_template("queries.html", **locals())
+            return render_template("queries.html", **locals())
 
-            except Exception as e:
-                if e.find("expired") != -1 :
-                    #aqui reescreve no arquivo para 1(expirado)
+        except Exception as e:
                 flash(e)
                 return render_template("queries.html", campo = campo)
-        else:
-            flash("Senha expirada, contate o administrador!")
     return render_template("queries.html") 
 
 if __name__ == "__main__":
