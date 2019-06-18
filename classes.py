@@ -19,6 +19,14 @@ from dataframes import *
 from defs import *
 from performance import *
 
+# db_file = os.path.dirname(os.path.abspath(__file__)) +"\\base.accdb"
+
+#     odbc_conn_str = 'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=%s' %\
+#                     (db_file)
+
+#     conn = pyodbc.connect(odbc_conn_str)
+#     cur = conn.cursor()
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'hashsometHingthatcantberepliedneVer'

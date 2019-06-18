@@ -3,3 +3,4 @@ bases
 __pycache__/
 bruce.ipynb
 *.pyc
+*.ipynb*
