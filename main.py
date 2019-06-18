@@ -407,8 +407,8 @@ def gerar_xml():
         except Exception as e:
             flash(e)
             return render_template("xmlgen.html",**locals())
-
-return render_template("xmlgen.html", sel_op=sel_op)
+        
+    return render_template("xmlgen.html", sel_op=sel_op)
 
 
 if __name__ == "__main__":
