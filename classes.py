@@ -1,6 +1,8 @@
-from flask import Flask, render_template, request, flash, url_for, session, app, Response, Blueprint, current_app, g
+from flask import Flask, render_template, request, flash, url_for, session, app, Response, Blueprint
 import cx_Oracle #, threading
 from flask_sqlalchemy import SQLAlchemy
+import xml.etree.ElementTree as ET
+
 import datetime as dt, pyodbc, time
 import hashlib
 from dateutil.relativedelta import *
@@ -17,7 +19,16 @@ import plotly, plotly.graph_objs as go
 from dataframes import *
 from defs import *
 from performance import *
-from query import *
+from xmlgen import *
+from xmlgenerator import *
+
+# db_file = os.path.dirname(os.path.abspath(__file__)) +"\\base.accdb"
+
+#     odbc_conn_str = 'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=%s' %\
+#                     (db_file)
+
+#     conn = pyodbc.connect(odbc_conn_str)
+#     cur = conn.cursor()
 
 
 app = Flask(__name__)

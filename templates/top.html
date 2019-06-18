@@ -23,12 +23,19 @@
             <td style="text-align:center"><a href="{{ url_for('main') }}">SAIR</a></td>
             <td style="text-align:center"><a href="{{ url_for('query') }}">QUERY</a></td>
             <td style="text-align:center"><a href="{{ url_for('consultas') }}">CONSULTAS PRONTAS</a></td>
+            <td style="text-align:center"><a href="{{ url_for('xmlgen') }}">WEBSERVICES</a></td>
             <td style="text-align:center"><a href="{{ url_for('performance.index') }}">PERFORMANCE</a></td>
             {% if session['matricula'] in ('80656720','80479177') %}
                 <td style="text-align:center"><a href="{{ url_for('novo') }}">USUÁRIOS</a></td>
                 <td style="text-align:center"><a href="{{ url_for('logs') }}">LOGS</a></td>
             {% endif %}
             
+        </tr>
+    </table>
+    <br><br><br>
+    <table>
+        <tr>
+            <td style="text-align:center"><h2>{{funcao_menu}}</h2></td>
         </tr>
     </table>
 {% block body %}{% endblock %}
