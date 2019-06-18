@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, flash, url_for, session, app, Response, Blueprint
 import cx_Oracle #, threading
 from flask_sqlalchemy import SQLAlchemy
-import xml.etree.ElementTree as ET
 
 import datetime as dt, pyodbc, time
 import hashlib
@@ -19,8 +18,6 @@ import plotly, plotly.graph_objs as go
 from dataframes import *
 from defs import *
 from performance import *
-from xmlgen import *
-from xmlgenerator import *
 
 # db_file = os.path.dirname(os.path.abspath(__file__)) +"\\base.accdb"
 
