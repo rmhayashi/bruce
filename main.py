@@ -232,8 +232,8 @@ def gerar_xml():
     data = []
     data2 = []
 
-    op_type = request.form.get("op_type")
-    txt_order = request.form.get("txt_order")
+    op_type = req("op_type")
+    txt_order = req("txt_order")
     
     pd.set_option('display.max_colwidth', -1)
     
