@@ -201,7 +201,7 @@ class XML(object):
         no_originSystem = ET.SubElement(no_reserveParams, "all:originSystem").text = "GVT"
         no_fixedLineHas = ET.SubElement(no_reserveParams, "all:fixedLineHas").text = "N"
 
-        indent(no_envelope)
+        no_envelope = indent(no_envelope)
         root = ET.tostring(no_envelope)
         return root
 
@@ -246,7 +246,7 @@ class XML(object):
         no_originSystem = ET.SubElement(no_allocateParams, 'all:originSystem').text = 'GVT'
         no_portabilityType = ET.SubElement(no_allocateParams, 'all:portabilityType').text = self.portabilityCode
 
-        indent(no_envelope)
+        no_envelope = indent(no_envelope)
         root = ET.tostring(no_envelope)
         return root
 
@@ -279,7 +279,7 @@ class XML(object):
 
         no_originSystem = ET.SubElement(no_envelope, "all:originSystem").text = "GVT"
 
-        indent(no_envelope)
+        no_envelope = indent(no_envelope)
         root = ET.tostring(no_envelope)
         return root
 
@@ -324,7 +324,7 @@ class XML(object):
 
         no_installationIndicative = ET.SubElement(no_activeReserve, 'imp:installationIndicative').text = 0
 
-        indent(no_envelope)
+        no_envelope = indent(no_envelope)
         root = ET.tostring(no_envelope)
         return root
 
