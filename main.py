@@ -218,9 +218,12 @@ def consultas():
 
 @app.route('/webservices', methods=['GET', 'POST'])
 def gerar_xml():
+    
     if not 'logado' in session:
         session['logado'] = False
         return render_template("top.html"), 200
+    
+    funcao_menu = 'Gerador de XML'
     
     sel_op = ''
     sel = ''
@@ -343,7 +346,7 @@ def gerar_xml():
                     elif ot == "Mudança de Endereço":
                         operationType = "MUDEND"
 
-                    elif operacao == "res" and ot == "Venda de Oferta":
+                    elif ot == "Venda de Oferta":
                         operationType = "INSADI"
 
                 else:
@@ -366,7 +369,7 @@ def gerar_xml():
                         operationType = "ALTPED"
                     elif ot == "Mudança de Endereço":
                         operationType = "MUDEND"
-                    elif operacao == "res" and ot == "Venda de Oferta":
+                    elif ot == "Venda de Oferta":
                         operationType = "INSADI"
 
                 else:
@@ -399,7 +402,7 @@ def gerar_xml():
                 result = xmlSig.sigActivate()
 
             elif operacao == "OPERACAO":
-                flash("Operacao inválida!")
+                return '<script>alert("Operacao inválida!")</script>'
                 
             logs = tlog(session['matricula'], operacao + ' ['+ xmlSig + ']', dt.datetime.now(), session['ip'])
             db.session.add(logs)
@@ -410,7 +413,7 @@ def gerar_xml():
             flash(e)
             return render_template("xmlgen.html",**locals())
         
-    return render_template("xmlgen.html", sel_op=sel_op)
+    return render_template("xmlgen.html", sel_op=sel_op, result='', funcao_menu=funcao_menu)
 
 
 if __name__ == "__main__":
