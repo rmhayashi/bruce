@@ -26,4 +26,6 @@ def query_builder(ds_tipo,ds_campo):
             sel_base += '<option value="'+ y +'" style="background-color:white" '+ sel +'>'+ y +'</option>'
 
         sel_base += '</optgroup>'
+    if y == "Ultimo CDR":
+        return (base, sel_base, query.format(ds_campo,ds_campo,ds_campo,ds_campo))
     return (base, sel_base, query.format(ds_campo))
