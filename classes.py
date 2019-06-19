@@ -20,7 +20,6 @@ from dataframes import *
 from defs import *
 from performance import *
 from xmlgen import *
-from xmlgenerator import *
 
 
 app = Flask(__name__)
@@ -201,7 +200,7 @@ class XML(object):
         no_originSystem = ET.SubElement(no_reserveParams, "all:originSystem").text = "GVT"
         no_fixedLineHas = ET.SubElement(no_reserveParams, "all:fixedLineHas").text = "N"
 
-        no_envelope = indent(no_envelope)
+        indent(no_envelope)
         root = ET.tostring(no_envelope)
         return root
 
@@ -246,7 +245,7 @@ class XML(object):
         no_originSystem = ET.SubElement(no_allocateParams, 'all:originSystem').text = 'GVT'
         no_portabilityType = ET.SubElement(no_allocateParams, 'all:portabilityType').text = self.portabilityCode
 
-        no_envelope = indent(no_envelope)
+        indent(no_envelope)
         root = ET.tostring(no_envelope)
         return root
 
@@ -279,7 +278,7 @@ class XML(object):
 
         no_originSystem = ET.SubElement(no_envelope, "all:originSystem").text = "GVT"
 
-        no_envelope = indent(no_envelope)
+        indent(no_envelope)
         root = ET.tostring(no_envelope)
         return root
 
@@ -324,7 +323,7 @@ class XML(object):
 
         no_installationIndicative = ET.SubElement(no_activeReserve, 'imp:installationIndicative').text = 0
 
-        no_envelope = indent(no_envelope)
+        indent(no_envelope)
         root = ET.tostring(no_envelope)
         return root
 
