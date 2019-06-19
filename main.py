@@ -35,7 +35,7 @@ def login():
         else:
             fl = 'S'
             flash("Necessário Alterar Senha")
-        
+
         return render_template("default.html",**locals()), 200
     else:
         v = usuario.query.filter_by(matricula = req('matricula'),senha = md5(req('senha'))).first()
@@ -82,7 +82,7 @@ def logs():
 
     dt1 = dt.datetime.now().date()
     dt2 = dt.datetime.now().date()
-    
+
     if request.method == 'POST':
         dt1 = req('dt1')
         dt2 = req('dt2')
@@ -92,7 +92,7 @@ def logs():
         logs = tlog.query.join(usuario,tlog.matricula == usuario.matricula) \
             .add_columns(tlog.id, tlog.dt, tlog.matricula, usuario.nome, tlog.descricao, tlog.ip) \
             .filter(tlog.dt >= dt1f, tlog.dt <= dt2f).order_by('dt').all()
-        
+
     return render_template('logs.html',**locals())
 
 
@@ -142,7 +142,7 @@ def query():
     sel_base = ''
 
     ds_base = req("ds_base")
-    
+
     df = pd.read_csv('bases/bases_oracle.csv',sep=';')
     df = df.sort_values(by = ['base'])
     for x, y in df[['base','conexao']].values:
@@ -156,7 +156,7 @@ def query():
     if request.method == 'POST':
         query = str(req("query")).replace(";","").strip()
         pd.set_option('display.max_colwidth', -1)
-        
+
         if query[0:6].upper() != 'SELECT':
             flash('NÃO É POSSÍVEL EXECUTAR')
             return render_template("query.html", **locals())
@@ -193,7 +193,7 @@ def consultas():
     ds_campo = str(req('ds_campo')).replace(";","").strip()
 
     base, sel_base, query = query_builder(ds_tipo, ds_campo)
-    
+
     if request.method == 'POST':
         pd.set_option('display.max_colwidth', -1)
 
@@ -222,7 +222,7 @@ def gerar_xml():
     if not 'logado' in session:
         session['logado'] = False
         return render_template("top.html"), 200
-    
+
     funcao_menu = 'Gerador de XML'
     
     sel_op = ''
@@ -346,7 +346,7 @@ def gerar_xml():
                     elif ot == "Mudança de Endereço":
                         operationType = "MUDEND"
 
-                    elif ot == "Venda de Oferta":
+                    elif operacao == "res" and ot == "Venda de Oferta":
                         operationType = "INSADI"
 
                 else:
@@ -369,8 +369,10 @@ def gerar_xml():
                         operationType = "ALTPED"
                     elif ot == "Mudança de Endereço":
                         operationType = "MUDEND"
-                    elif ot == "Venda de Oferta":
+                    elif operacao == "res" and ot == "Venda de Oferta":
                         operationType = "INSADI"
+                        data2[1] = "NDS"
+                        data2[0] = "DV"
 
                 else:
 
@@ -378,16 +380,18 @@ def gerar_xml():
                     productTopologyType = data2[7]
                     productTopologyCategory = data2[8]
 
-            # Preenchimento dos parâmetros do xml a ser gerado
+            # Preenchimento dos parâmetros do shape do XML com dados do Oracle, base
+            # da icweb e sieb8
 
             xmlSig = XML(data[0], data[1], data[2], data[3], data[4],
-                      data[5], data[6], data[7], data[8], data[9],
-                      data[10], data[11], data[12], data[13], data2[0],
-                      data2[1], data2[2], data2[3], data2[4], data2[6],
-                      operationType, productTopologyType, productTopologyCategory,
-                      "N", txt_order)
+                         data[5], data[6], data[7], data[8], data[9],
+                         data[10], data[11], data[12], data[13], data2[0],
+                         data2[1], data2[2], data2[3], data2[4], data2[6],
+                         operationType, productTopologyType, productTopologyCategory,
+                         "N", txt_order)
 
-            # Verifica o tipo de operação selecionada
+            # VERIFICA A FUNÇÃO QUE DEVE SER EXECUTADA
+            # POR MEIO DO TIPO DE OPERAÇÃO SELECIONADA
 
             if operacao == "res":
                 result = xmlSig.sigReserve()
@@ -418,4 +422,4 @@ def gerar_xml():
 
 if __name__ == "__main__":
     db.create_all()
-    app.run(debug=True, use_reloader=True,port=5000,host='0.0.0.0')
+    app.run(debug=True, use_reloader=True, port=5000, host='0.0.0.0')
