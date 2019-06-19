@@ -138,25 +138,29 @@ def query():
 
     funcao_menu = 'Consultas Construídas pelo Usuário'
 
-    sel = ''
-    sel_base = ''
-
     ds_base = req("ds_base")
+    
+    def monta_base():
+        sel = ''
+        sel_base = ''
+        conexao = ''
+        df = pd.read_csv('bases/bases_oracle.csv',sep=';')
+        df = df.sort_values(by = ['base'])
+        for x, y in df[df['status'] == 1][['base','conexao']].values:
+            if ds_base == x:
+                sel = 'selected'
+                conexao = y
+            else:
+                sel = ''
+            sel_base += '<option value="'+ x +'" '+ sel +'>'+ x +'</option>'
+        return sel_base, df, conexao
 
-    df = pd.read_csv('bases/bases_oracle.csv',sep=';')
-    df = df.sort_values(by = ['base'])
-    for x, y in df[['base','conexao']].values:
-        if ds_base == x:
-            sel = 'selected'
-            conexao = y
-        else:
-            sel = ''
-        sel_base += '<option value="'+ x +'" '+ sel +'>'+ x +'</option>'
+    sel_base, df, conexao = monta_base()
 
     if request.method == 'POST':
         query = str(req("query")).replace(";","").strip()
         pd.set_option('display.max_colwidth', -1)
-
+        
         if query[0:6].upper() != 'SELECT':
             flash('NÃO É POSSÍVEL EXECUTAR')
             return render_template("query.html", **locals())
@@ -174,10 +178,14 @@ def query():
                 return render_template("query.html", **locals())
 
             except Exception as e:
+                if str(e).find('password') > 0:
+                    df.loc[df['base'] == ds_base, 'status'] = 0
+                    df.to_csv('bases/bases_oracle.csv',sep=';',index=False)
                 flash(e)
+                sel_base, df, conexao = monta_base()
                 return render_template("query.html", **locals())
 
-    return render_template("query.html", **locals())
+return render_template("query.html", **locals())
 
 
 
