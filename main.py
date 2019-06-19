@@ -35,7 +35,7 @@ def login():
         else:
             fl = 'S'
             flash("Necessário Alterar Senha")
-        
+
         return render_template("default.html",**locals()), 200
     else:
         v = usuario.query.filter_by(matricula = req('matricula'),senha = md5(req('senha'))).first()
@@ -82,7 +82,7 @@ def logs():
 
     dt1 = dt.datetime.now().date()
     dt2 = dt.datetime.now().date()
-    
+
     if request.method == 'POST':
         dt1 = req('dt1')
         dt2 = req('dt2')
@@ -92,7 +92,7 @@ def logs():
         logs = tlog.query.join(usuario,tlog.matricula == usuario.matricula) \
             .add_columns(tlog.id, tlog.dt, tlog.matricula, usuario.nome, tlog.descricao, tlog.ip) \
             .filter(tlog.dt >= dt1f, tlog.dt <= dt2f).order_by('dt').all()
-        
+
     return render_template('logs.html',**locals())
 
 
@@ -138,20 +138,24 @@ def query():
 
     funcao_menu = 'Consultas Construídas pelo Usuário'
 
-    sel = ''
-    sel_base = ''
-
     ds_base = req("ds_base")
     
-    df = pd.read_csv('bases/bases_oracle.csv',sep=';')
-    df = df.sort_values(by = ['base'])
-    for x, y in df[['base','conexao']].values:
-        if ds_base == x:
-            sel = 'selected'
-            conexao = y
-        else:
-            sel = ''
-        sel_base += '<option value="'+ x +'" '+ sel +'>'+ x +'</option>'
+    def monta_base():
+        sel = ''
+        sel_base = ''
+        conexao = ''
+        df = pd.read_csv('bases/bases_oracle.csv',sep=';')
+        df = df.sort_values(by = ['base'])
+        for x, y in df[df['status'] == 1][['base','conexao']].values:
+            if ds_base == x:
+                sel = 'selected'
+                conexao = y
+            else:
+                sel = ''
+            sel_base += '<option value="'+ x +'" '+ sel +'>'+ x +'</option>'
+        return sel_base, df, conexao
+
+    sel_base, df, conexao = monta_base()
 
     if request.method == 'POST':
         query = str(req("query")).replace(";","").strip()
@@ -174,10 +178,14 @@ def query():
                 return render_template("query.html", **locals())
 
             except Exception as e:
+                if str(e).find('password') > 0:
+                    df.loc[df['base'] == ds_base, 'status'] = 0
+                    df.to_csv('bases/bases_oracle.csv',sep=';',index=False)
                 flash(e)
+                sel_base, df, conexao = monta_base()
                 return render_template("query.html", **locals())
 
-    return render_template("query.html", **locals())
+return render_template("query.html", **locals())
 
 
 
@@ -193,7 +201,7 @@ def consultas():
     ds_campo = str(req('ds_campo')).replace(";","").strip()
 
     base, sel_base, query = query_builder(ds_tipo, ds_campo)
-    
+
     if request.method == 'POST':
         pd.set_option('display.max_colwidth', -1)
 
@@ -218,9 +226,12 @@ def consultas():
 
 @app.route('/webservices', methods=['GET', 'POST'])
 def gerar_xml():
+    
     if not 'logado' in session:
         session['logado'] = False
         return render_template("top.html"), 200
+
+    funcao_menu = 'Gerador de XML'
     
     sel_op = ''
     sel = ''
@@ -229,9 +240,11 @@ def gerar_xml():
     data = []
     data2 = []
 
-    op_type = request.form.get("op_type")
-    txt_order = request.form.get("txt_order")
-
+    op_type = req("op_type")
+    txt_order = req("txt_order")
+    
+    pd.set_option('display.max_colwidth', -1)
+    
     df = pd.read_csv('operacoes.csv', sep=';')
     df = df.sort_values(by=['op_type'])
 
@@ -366,6 +379,8 @@ def gerar_xml():
                         operationType = "MUDEND"
                     elif operacao == "res" and ot == "Venda de Oferta":
                         operationType = "INSADI"
+                        data2[1] = "NDS"
+                        data2[0] = "DV"
 
                 else:
 
@@ -373,16 +388,18 @@ def gerar_xml():
                     productTopologyType = data2[7]
                     productTopologyCategory = data2[8]
 
-            # Preenchimento dos parâmetros do xml a ser gerado
+            # Preenchimento dos parâmetros do shape do XML com dados do Oracle, base
+            # da icweb e sieb8
 
             xmlSig = XML(data[0], data[1], data[2], data[3], data[4],
-                      data[5], data[6], data[7], data[8], data[9],
-                      data[10], data[11], data[12], data[13], data2[0],
-                      data2[1], data2[2], data2[3], data2[4], data2[6],
-                      operationType, productTopologyType, productTopologyCategory,
-                      "N", txt_order)
+                         data[5], data[6], data[7], data[8], data[9],
+                         data[10], data[11], data[12], data[13], data2[0],
+                         data2[1], data2[2], data2[3], data2[4], data2[6],
+                         operationType, productTopologyType, productTopologyCategory,
+                         "N", txt_order)
 
-            # Verifica o tipo de operação selecionada
+            # VERIFICA A FUNÇÃO QUE DEVE SER EXECUTADA
+            # POR MEIO DO TIPO DE OPERAÇÃO SELECIONADA
 
             if operacao == "res":
                 result = xmlSig.sigReserve()
@@ -397,7 +414,7 @@ def gerar_xml():
                 result = xmlSig.sigActivate()
 
             elif operacao == "OPERACAO":
-                flash("Operacao inválida!")
+                return '<script>alert("Operacao inválida!")</script>'
                 
             logs = tlog(session['matricula'], operacao + ' ['+ xmlSig + ']', dt.datetime.now(), session['ip'])
             db.session.add(logs)
@@ -407,10 +424,10 @@ def gerar_xml():
         except Exception as e:
             flash(e)
             return render_template("xmlgen.html",**locals())
-
-return render_template("xmlgen.html", sel_op=sel_op)
+        
+    return render_template("xmlgen.html", sel_op=sel_op, result='', funcao_menu=funcao_menu)
 
 
 if __name__ == "__main__":
     db.create_all()
-    app.run(debug=True, use_reloader=True,port=5000,host='0.0.0.0')
+    app.run(debug=True, use_reloader=True, port=5000, host='0.0.0.0')
