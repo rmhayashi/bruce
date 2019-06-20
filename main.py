@@ -185,7 +185,7 @@ def query():
                 sel_base, df, conexao = monta_base()
                 return render_template("query.html", **locals())
 
-return render_template("query.html", **locals())
+    return render_template("query.html", **locals())
 
 
 
