@@ -185,8 +185,7 @@ def query():
                 sel_base, df, conexao = monta_base()
                 return render_template("query.html", **locals())
 
-return render_template("query.html", **locals())
-
+    return render_template("query.html", **locals())
 
 
 @app.route("/consultas",methods=['GET', 'POST'])
@@ -226,20 +225,13 @@ def consultas():
 
 @app.route('/webservices', methods=['GET', 'POST'])
 def gerar_xml():
-<<<<<<< HEAD
-=======
-    
->>>>>>> 6ebb39c93bdeefe6bc16f16e582b390d36bece14
+
     if not 'logado' in session:
         session['logado'] = False
         return render_template("top.html"), 200
 
     funcao_menu = 'Gerador de XML'
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 6ebb39c93bdeefe6bc16f16e582b390d36bece14
     sel_op = ''
     sel = ''
     result = ''
@@ -249,15 +241,11 @@ def gerar_xml():
 
     op_type = req("op_type")
     txt_order = req("txt_order")
-<<<<<<< HEAD
 
     pd.set_option('display.max_colwidth', -1)
-
-=======
     
     pd.set_option('display.max_colwidth', -1)
-    
->>>>>>> 6ebb39c93bdeefe6bc16f16e582b390d36bece14
+
     df = pd.read_csv('operacoes.csv', sep=';')
     df = df.sort_values(by=['op_type'])
 
@@ -271,19 +259,12 @@ def gerar_xml():
             sel = ''
             sel_op += '<option value="' + x + '" ' + sel + '>' + x + '</option>'
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 6ebb39c93bdeefe6bc16f16e582b390d36bece14
     if request.method == "POST":
         try:
 
             conn_pweb = cx_Oracle.connect()  # DEVE-SE PREENCHER CONEXÃO
-<<<<<<< HEAD
             conn_sieb8 = cx_Oracle.connect()  # DEVE-SE PREENCHER CONEXÃO
-=======
-            conn_sieb8 = cx_Oracle.connect() # DEVE-SE PREENCHER CONEXÃO
->>>>>>> 6ebb39c93bdeefe6bc16f16e582b390d36bece14
+
 
             querys8 = ("""SELECT sap.x_cnl, asset_integ_id, sap.x_cnl_code, sap.x_street_type, sap.ADDR, sap.x_number,
                    sap.x_neighborhood, sap.city, sap.state, x_street_code, soi.X_ACCESS_TECHNOLOGY, so.X_GVT_GERA_BA ,x_order_type,
@@ -411,11 +392,7 @@ def gerar_xml():
             # Preenchimento dos parâmetros do shape do XML com dados do Oracle, base
             # da icweb e sieb8
 
-<<<<<<< HEAD
-            xmlSig = xmlSigres(data[0], data[1], data[2], data[3], data[4],
-=======
             xmlSig = XML(data[0], data[1], data[2], data[3], data[4],
->>>>>>> 6ebb39c93bdeefe6bc16f16e582b390d36bece14
                          data[5], data[6], data[7], data[8], data[9],
                          data[10], data[11], data[12], data[13], data2[0],
                          data2[1], data2[2], data2[3], data2[4], data2[6],
@@ -439,7 +416,6 @@ def gerar_xml():
 
             elif operacao == "OPERACAO":
                 return '<script>alert("Operacao inválida!")</script>'
-<<<<<<< HEAD
 
             logs = tlog(session['matricula'], operacao + ' [' + xmlSig + ']', dt.datetime.now(), session['ip'])
             db.session.add(logs)
@@ -452,21 +428,6 @@ def gerar_xml():
 
     return render_template("xmlgen.html", sel_op=sel_op, result='', funcao_menu=funcao_menu)
 
-=======
-                
-            logs = tlog(session['matricula'], operacao + ' ['+ xmlSig + ']', dt.datetime.now(), session['ip'])
-            db.session.add(logs)
-
-            return render_template("xmlgen.html",**locals())
-
-        except Exception as e:
-            flash(e)
-            return render_template("xmlgen.html",**locals())
-        
-    return render_template("xmlgen.html", sel_op=sel_op, result='', funcao_menu=funcao_menu)
-
-
->>>>>>> 6ebb39c93bdeefe6bc16f16e582b390d36bece14
 if __name__ == "__main__":
     db.create_all()
     app.run(debug=True, use_reloader=True, port=5000, host='0.0.0.0')
