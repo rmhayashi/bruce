@@ -13,7 +13,9 @@ def query_builder(ds_tipo,ds_campo):
     query = ''
 
     df = pd.read_csv('bases/consultas.csv',sep=';')
-    df = df.sort_values(by = ['base'])
+    df2 = pd.read_csv('bases/bases_oracle.csv',sep=';')
+    df = df[df['base'].isin(df2[df2['status'] == 1]['base'])].sort_values(by = ['base','tipo'])
+    # df = df.sort_values(by = ['base'])
     for x in df['base'].unique():
         sel_base += '<optgroup label="'+ x +'" style="background-color:silver">'
         for y, q in df[df['base'] == x][['tipo','query']].values:

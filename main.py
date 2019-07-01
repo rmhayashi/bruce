@@ -206,7 +206,7 @@ def consultas():
         pd.set_option('display.max_colwidth', -1)
 
         df = pd.read_csv('bases/bases_oracle.csv',sep=';')
-        conexao = df[df['base'] == base]['conexao'].to_string(index=False)
+        conexao = df[(df['base'] == base) & (df['status'] == 1)]['conexao'].to_string(index=False)
         try:
             conn_oracle = cx_Oracle.connect(conexao)
             df_o = pd.read_sql(query, conn_oracle)
@@ -219,8 +219,13 @@ def consultas():
             return render_template("queries.html", **locals())
 
         except Exception as e:
-                flash(e)
-                return render_template("queries.html", **locals())
+            if str(e).find('password') > 0:
+                df.loc[df['base'] == base, 'status'] = 0
+                df.to_csv('bases/bases_oracle.csv',sep=';',index=False)
+                base, sel_base, query = query_builder(ds_tipo, ds_campo)
+
+            flash(e)
+            return render_template("queries.html", **locals())
     return render_template("queries.html", sel_base = sel_base, ds_campo = '', funcao_menu = funcao_menu)
 
 
