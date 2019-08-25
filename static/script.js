@@ -28,3 +28,13 @@ function opcoes(pg,dv,data){
     // }
   })
 }
+
+
+function open_menu() {
+  var x = document.getElementById("dv_menu");
+  if (x.className === "menu") {
+    x.className += " responsive";
+  } else {
+    x.className = "menu";
+  }
+}

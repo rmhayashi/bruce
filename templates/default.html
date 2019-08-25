@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html style="background: url({{ url_for('static', filename='bg2.jpg') }}) no-repeat center fixed; background-size: cover;">
 <head>
     <title>Bruce Lee</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -20,29 +20,29 @@
     };
 
     function esqueceu_senha(){
-        var mat = document.getElementById("matricula").value;
+        var mat = document.getElementById("ds_login").value;
         if (mat == ""){
             alert("Favor digite sua matrícula");
-            document.getElementById("matricula").focus();
+            document.getElementById("ds_login").focus();
         }else{
-            document.frm_esq.matricula.value = mat;
-            document.frm_esq.senha.value = mat;
+            document.frm_esq.ds_login.value = mat;
+            document.frm_esq.ds_senha.value = mat;
             document.frm_esq.submit();
         }
     }
 </script>
 
 <div class="container">
-    <div class="box">
+    <div class="login">
         <form name="frm" method="post" action="{{ url_for('login') }}" {% if fl %} onsubmit="return confirma()" {% endif %}>
             <table>
                 <tr>
-                    <td style="width:100px">Matrícula:</td>
-                    <td><input type="text" name="matricula" id="matricula" value="{{matricula}}" autofocus required></td>
+                    <td style="width:100px">Login:</td>
+                    <td><input type="text" name="ds_login" id="ds_login" value="{{ds_login}}" autofocus required></td>
                 </tr>
                 <tr>
                     <td>Senha:</td>
-                    <td><input type="password" name="senha" id="senha" value="{{senha}}" required></td>
+                    <td><input type="password" name="ds_senha" id="ds_senha" value="{{nova_senha}}" required></td>
                 </tr>
             {% if fl %}
                 {% set alt_senha = fl %}
@@ -79,6 +79,9 @@
                         {% if not fl %}
                             <br><br>
                             <a onclick="esqueceu_senha()" style="font-size:10px;cursor:pointer">Esqueci minha Senha</a>
+                        {% else %}
+                        &nbsp;&nbsp;&nbsp;
+                        <input type="button" name="bt_voltar" id="bt_voltar" value="Voltar" onclick="location.href='{{ url_for('main') }}'">
                         {% endif %}
                     </td>
                 </tr>
@@ -87,8 +90,8 @@
     </div>
 </div>
 <form name="frm_esq" method="POST" action="{{ url_for('login') }}">
-    <input type="hidden" name="matricula" id="matricula2">
-    <input type="hidden" name="senha" id="senha2">
+    <input type="hidden" name="ds_login" id="ds_login2">
+    <input type="hidden" name="ds_senha" id="ds_senha2">
 </form>
 {% if fl %}
     <script>

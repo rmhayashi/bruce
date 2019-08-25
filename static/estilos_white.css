@@ -6,18 +6,19 @@
 }
 
 html { 
-	background: url(bruce.jpg) no-repeat center fixed; 
+	background: url(bruce_white.jpg) no-repeat center fixed; 
 	background-size: cover;
   }
 
 body {
-	color: white;
-	background-color: black;
+	color: black;
+	background-color: white;
 	font-size: 14px;
 }
 
 input[type=text], textarea, input[type=password], input[type=email]{
 	width: 99.9%;
+	background-color: #e2e1e1;
 }
 
 input[type=submit],input[type=button]{
@@ -53,7 +54,7 @@ input[type=submit]:hover,input[type=button]:hover {
 
 .login {
 	width: 400px;
-	background: black;
+	background: white;
 	justify-content: center;
 	font-size: 20px;
 }
@@ -62,19 +63,19 @@ input[type=submit]:hover,input[type=button]:hover {
 	position: fixed; 
 	left: 0; 
 	top: 0; 
-	background-color:black; 
+	background-color:white; 
 	z-index: 100;
 	overflow: hidden;
 	width:100%;
 	text-align: center;
 	display: flex;
 	justify-content: space-between;
-	border-bottom: 3px double #8c8b8b;
+	border-bottom: 3px double #1d1d1d;
 }
 
 .menu a {
 	display: inline-block;
-	color: white;
+	color: black;
 	text-align: center;
 	padding: 4px 6px;
 	text-decoration: none;
@@ -83,14 +84,14 @@ input[type=submit]:hover,input[type=button]:hover {
   }
 
 .menu a:hover {
-	background-color: #ddd;
-	color: black;
+	background-color: rgb(26, 26, 26);
+	color: white;
 	cursor: pointer;
 }
 
 .menu a.active {
 	background-color: rgba(220, 175, 48);
-	color: white;
+	color: black;
 	cursor: none;
   }
 
@@ -144,7 +145,7 @@ th {
 }
 
 .rel td{
-	border: 1px white solid;
+	border: 1px black solid;
 	border-spacing: 0px;
 	padding: 5px;
 	border-radius: 0px;
@@ -155,7 +156,7 @@ th {
 }
 
 a {
-	color: white;
+	color: black;
 	font-size: 14px;
 	text-decoration: none;
 }

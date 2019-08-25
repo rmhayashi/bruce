@@ -1,0 +1,32 @@
+{% extends "top.html" %}
+
+{% block body %}
+
+{% for category, message in get_flashed_messages(with_categories = true) %}
+    <div class="alerta">
+        {{ message }}
+    </div>
+{% endfor %}
+<br><br>
+<form name="frm" method="post" action="{{ url_for('retorno.atu_acesso') }}">
+{% for key, x in df.iterrows() %}
+    {% if x['ID_USUARIO_ACESSO']|string != 'nan' %}
+        {% set check = 'checked' %}
+    {% else %}
+        {% set check = '' %}
+    {% endif %}
+    <div class="col-3">
+        <input type="checkbox" name="id_tipo" value="{{ x['ID_TIPO'] }}" id="{{ x['ID_TIPO'] }}" {{ check }}>
+        <label for="{{ x['ID_TIPO'] }}">{{ x['DS_TIPO'] }}</label>
+    </div>
+{% endfor %}
+<br><br><br><br>
+<div class="col-12" style="text-align:center">
+    <input type="hidden" name="id_usuario" value="{{ id_usuario }}">
+    <input type="submit" name="bt" value="ATUALIZAR">
+    &nbsp;&nbsp;&nbsp;
+    <input type="button" name="bt" value="VOLTAR" onclick="window.location.href = '{{ url_for('usuarios.index') }}'">
+</div>
+</form>
+
+{% endblock %}

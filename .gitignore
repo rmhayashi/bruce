@@ -4,3 +4,4 @@ __pycache__/
 bruce.ipynb
 *.pyc
 *.ipynb*
+.ipynb*

@@ -1,0 +1,96 @@
+{% extends "top.html" %}
+
+{% block body %}
+<script>
+    function valida_login(mat){
+        if (mat){
+            opcoes('{{ url_for('retorno.valida_login') }}','dv',{ds_login:mat});
+        }
+    }
+
+    function conf_excluir(mat,nom,id){
+        if(confirm("Deseja realmente excluir "+ nom)){
+            opcoes('{{ url_for('retorno.excluir_login') }}','dv',
+                {
+                    ds_login:mat,
+                    no_usuario:nom,
+                    id_usuario:id
+                }
+            );
+        }
+    }
+
+    function edit_acesso(id){
+        document.frm_acesso.id_usuario.value = id;
+        document.frm_acesso.submit()
+    }
+</script>
+<form name="frm" method="post" action="{{ request.path }}">
+<table style="width:50%">
+    <tr>
+        <td style="width:80px">Login:</td>
+        <td><input type="text" name="ds_login" id="ds_login" onkeyup="filtra(0,this.value)" onblur="valida_login(this.value)" autofocus required></td>
+    </tr>
+    <tr>
+        <td>Nome:</td>
+        <td><input type="text" name="no_usuario" id="no_usuario" required></td>
+    </tr>
+    <tr>
+        <td>E-mail:</td>
+        <td><input type="email" name="ds_email" id="ds_email" required></td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:center">
+            <input type="submit" name="bt" value="Cadastrar">
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:center" id="dv">&nbsp;</td>
+    </tr>
+</table>
+</form>
+<br>
+{% for category, message in get_flashed_messages(with_categories = true) %}
+    <div class="alerta">
+        {{ message }}
+    </div>
+{% endfor %}
+        
+<table class="rel" id="tbfiltro" style="width:99%">
+    <thead>
+        <tr>
+            <th style="text-align:center;width: 10%">Login</th>
+            <th>Nome</th>
+            <th style="width: 20%">E-mail</th>
+            <th style="width: 15%">Último Acesso</th>
+            <th style="width: 10%">Status</th>
+            <th style="width: 10%">Acessos</th>
+            <th style="width: 10%">Excluir</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        
+        {% for usr in table %}
+            <tr>
+                <td style="text-align:center;">{{ usr['DS_LOGIN'] }}</td>
+                <td>{{ usr['NO_USUARIO'] }}</td>
+                <td style="text-align:center;">{{ usr['DS_EMAIL'] }}&nbsp;</td>
+                <td style="text-align:center;">{{ usr['DT_ACESSO'] }}</td>
+                <td style="text-align:center;">
+                    {% if usr['FL_ATIVO'] == 1 %}
+                        ATIVO
+                    {% else %}
+                        BLOQUEADO
+                    {% endif %}
+                </td>
+                <td style="text-align:center;color:red;font-size:12px;cursor:pointer;" title="Editar Acessos de {{ usr['NO_USUARIO'] }}" onclick="edit_acesso({{ usr['ID_USUARIO'] }});">&Delta;</td>
+                <td style="text-align:center;color:red;font-size:12px;cursor:pointer;" title="Excluir {{ usr['NO_USUARIO'] }}" onclick="conf_excluir('{{ usr['DS_LOGIN'] }}','{{ usr['NO_USUARIO'] }}',{{ usr['ID_USUARIO'] }});">X</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<form name="frm_acesso" method="POST" action="{{ url_for('usuarios.acessos') }}">
+    <input type="hidden" name="id_usuario">
+</form>
+{% endblock %}

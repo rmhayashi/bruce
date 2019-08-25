@@ -1,83 +1,87 @@
 from classes import *
 
 @app.before_request
-def before():
-    if 'logado' in session:
-        if session['logado']:
-            session['logado'] = session['logado']
-            session['nome'] = session['nome']
-            session['matricula'] = session['matricula']
-            # print(session.logado)
+def before_request():
+    g.conn = conn
+    g.cur = conn.cursor()
+    if 'logado' not in session:
+        g.menu = None
+        if request.endpoint not in ('login','main','static'):
+            flash('Sessão Expirada!')
+            return redirect(url_for('main'))
+    else:
+        g.menu = monta_menu()
 
+# @app.context_processor
+# def context_processor():
 
 @app.route("/")
 def main():
-    session['logado'] = False
+    session.pop('logado', None)
     return render_template("default.html"), 200
 
 
-@app.route("/login",methods=['GET', 'POST'])
+@app.route("/login",methods=['POST'])
 def login():
-    matricula = req('matricula')
-    senha = req('senha')
+    ds_login = req('ds_login')
+    ds_senha = req('ds_senha')
     alt_senha = req('alt_senha')
+    nova_senha = req('nova_senha')
 
-    if matricula == senha:
+    if ds_login == ds_senha:
         if alt_senha == 'S':
-            senha = req('nova_senha')
-            nova_senha = md5(req('nova_senha'))
-            usuario.query.filter_by(matricula = matricula).update({'senha' : nova_senha})
-            flash('Senha atualizada com Sucesso!')
-            fl = ''
-            logs = tlog(matricula,'Alteração de Senha', dt.datetime.now(), request.remote_addr)
-            db.session.add(logs)
-            db.session.commit()
+            try:
+                ds_senha = md5(nova_senha)
+                sql = "UPDATE TUSUARIO SET DS_SENHA = ? WHERE DS_LOGIN = ?"
+                g.cur.execute (sql,(ds_senha, ds_login))
+                flash('Senha atualizada com Sucesso!')
+                fl = ''
+                sql = "SELECT ID_USUARIO FROM TUSUARIO WHERE DS_LOGIN = ?"
+                df = pd.read_sql(sql, g.conn,params=[ds_login])
+                id_usuario = int(df['ID_USUARIO'][0])
+                sql = "INSERT INTO TLOG (FK_TIPO_LOG, FK_USUARIO_CADASTRO, DS_IP, DS_LOG) VALUES (?,?,?,?)"
+                g.cur.execute (sql,(4,id_usuario,request.remote_addr, 'Alteração de senha'))
+            except Exception as e:
+                flash('Login inexistente ou bloqueado!')
+                return render_template("default.html")
         else:
             fl = 'S'
             flash("Necessário Alterar Senha")
         
         return render_template("default.html",**locals()), 200
     else:
-        v = usuario.query.filter_by(matricula = req('matricula'),senha = md5(req('senha'))).first()
-        if v:
-            session['logado'] = True
-            session['nome'] = v.nome
-            session['matricula'] = v.matricula
-            session['ip'] = request.remote_addr
-        else:
-            flash('Matrícula ou Senha incorretos!')
+        try:
+            sql = '''
+                SELECT ID_USUARIO, DS_LOGIN, NO_USUARIO, DS_SENHA, FL_ATIVO, DS_ESTILO
+                FROM TUSUARIO 
+                WHERE DS_LOGIN = ? AND FL_ATIVO = 1
+                '''
+            df = pd.read_sql(sql, g.conn, params=[ds_login])
+            v = vmd5(ds_senha,df['DS_SENHA'][0])
+            if v:
+                session['logado'] = True
+                session['id_usuario'] = str(df['ID_USUARIO'][0])
+                session['nome'] = str(df.NO_USUARIO[0])
+                session['matricula'] = str(df.DS_LOGIN[0])
+                session['ip'] = request.remote_addr
+                session['estilo'] = str(df['DS_ESTILO'][0])
+                sql = "INSERT INTO TLOG (FK_TIPO_LOG, FK_USUARIO_CADASTRO, DS_IP, DS_LOG) VALUES (?,?,?,?)"
+                g.cur.execute (sql,(2,session['id_usuario'],session['ip'], 'Acesso ao sistema'))
+                g.cur.execute('UPDATE TUSUARIO SET DT_ACESSO = NOW() WHERE ID_USUARIO = ?',session['id_usuario'])
+
+                g.menu = monta_menu()
+
+                return render_template("top.html",**locals()), 200
+            else:
+                flash('Login ou Senha incorretos!')
+                return render_template("default.html")
+        except Exception as e:
+            flash('Login inexistente ou bloqueado!')
             return render_template("default.html")
 
-
-    return render_template("top.html",**locals()), 200
-
-
-
-@app.route("/novo",methods=['POST','GET'])
-def novo():
-    if not 'logado' in session:
-        session['logado'] = False
-        return render_template("top.html"), 200
-
-    funcao_menu = 'Controle de Usuários'
-
-    if request.method == 'POST':
-        user = usuario(req('matricula'),req('nome'),req('matricula'))
-        db.session.add(user)
-        flash('Usuário Cadastrado com Sucesso!')
-
-    usrs = usuario.query.filter(usuario.matricula != '80656720',usuario.matricula != '80479177').order_by('nome').all()
-
-    return render_template('novo.html',**locals())
-
-
-
+ 
 @app.route("/logs",methods=['POST','GET'])
 def logs():
-    if not 'logado' in session:
-        session['logado'] = False
-        return render_template("top.html"), 200
-
     funcao_menu = 'Log de Acessos e Consultas'
 
     dt1 = dt.datetime.now().date()
@@ -88,147 +92,29 @@ def logs():
         dt2 = req('dt2')
         dt1f = dt.datetime.strptime(dt1,'%Y-%m-%d')
         dt2f = dt.datetime.strptime(dt2,'%Y-%m-%d') + dt.timedelta(days=1)
-        # logs = tlog.query.order_by('dt').all()
-        logs = tlog.query.join(usuario,tlog.matricula == usuario.matricula) \
-            .add_columns(tlog.id, tlog.dt, tlog.matricula, usuario.nome, tlog.descricao, tlog.ip) \
-            .filter(tlog.dt >= dt1f, tlog.dt <= dt2f).order_by('dt').all()
+        
+        params = (dt1f,dt2f)
+        # table = g.cur.execute('''SELECT * FROM VW_LOG V WHERE DATA BETWEEN ? AND ? ORDER BY V.ID_LOG''',params)
+
+        table = pd.read_sql('''SELECT * FROM VW_LOG V WHERE DATA BETWEEN ? AND ? ORDER BY V.ID_LOG''',g.conn,params=params)
+        table = [table.to_html(classes='rel',index=False)]
         
     return render_template('logs.html',**locals())
 
 
+@app.route("/xml",methods=['GET', 'POST'])
+def xml():
+    import xml.etree.cElementTree as ET
 
-@app.route("/valida_login",methods=['POST','GET'])
-def valida_login():
-    if not 'logado' in session:
-        session['logado'] = False
-        return render_template("top.html"), 200
+    root = ET.Element("root")
+    doc = ET.SubElement(root, "doc")
 
-    if request.method == 'POST':
-        matricula = req('matricula')
-        if req('acao') == 'select':
-            v = usuario.query.filter_by(matricula = matricula).first()
-            if v:
-                return '''
-                    <script>
-                        parent.document.getElementById("matricula").value = "";
-                        parent.document.getElementById("matricula").focus();
-                    </script>
-                    <span style="color:red;font-size:14px">Usuário Já Existe</span>'''
-            else:
-                return ''
-        elif req('acao') == 'excluir' and session['matricula'] in ('80656720','80479177'):
-            logs = tlog(session['matricula'],'Exclusão Usuário '+ matricula, dt.datetime.now(), session['ip'])
-            db.session.add(logs)
+    ET.SubElement(doc, "field1", name="blah").text = "some value1"
+    ET.SubElement(doc, "field2", name="asdfasd").text = "some vlaue2"
 
-            usuario.query.filter_by(matricula = req('matricula')).delete()
-            return '''
-                    <script>
-                        parent.window.location.href = '/novo';
-                    </script>
-                    '''
-        else:
-            return '<script>alert("Sem Acesso!")</script>'
-
-
-@app.route("/query",methods=['GET', 'POST'])
-def query():
-    if not 'logado' in session:
-        session['logado'] = False
-        return render_template("top.html"), 200
-
-    funcao_menu = 'Consultas Construídas pelo Usuário'
-
-    ds_base = req("ds_base")
-    
-    def monta_base():
-        sel = ''
-        sel_base = ''
-        conexao = ''
-        df = pd.read_csv('bases/bases_oracle.csv',sep=';')
-        df = df.sort_values(by = ['base'])
-        for x, y in df[df['status'] == 1][['base','conexao']].values:
-            if ds_base == x:
-                sel = 'selected'
-                conexao = y
-            else:
-                sel = ''
-            sel_base += '<option value="'+ x +'" '+ sel +'>'+ x +'</option>'
-        return sel_base, df, conexao
-
-    sel_base, df, conexao = monta_base()
-
-    if request.method == 'POST':
-        query = str(req("query")).replace(";","").strip()
-        pd.set_option('display.max_colwidth', -1)
-        
-        if query[0:6].upper() != 'SELECT':
-            flash('NÃO É POSSÍVEL EXECUTAR')
-            return render_template("query.html", **locals())
-        else:
-            try:
-                conn_oracle = cx_Oracle.connect(conexao)
-                # conn_oracle.callTimeout(1)
-                df_o = pd.read_sql(query, conn_oracle)
-                resultado = df_o
-                tables=[df_o.to_html(classes='rel')]
-
-                logs = tlog(session['matricula'], ds_base + ' ['+ query + ']', dt.datetime.now(), session['ip'])
-                db.session.add(logs)
-
-                return render_template("query.html", **locals())
-
-            except Exception as e:
-                if str(e).find('password') > 0:
-                    df.loc[df['base'] == ds_base, 'status'] = 0
-                    df.to_csv('bases/bases_oracle.csv',sep=';',index=False)
-                flash(e)
-                sel_base, df, conexao = monta_base()
-                return render_template("query.html", **locals())
-
-    return render_template("query.html", **locals())
-
-
-
-@app.route("/consultas",methods=['GET', 'POST'])
-def consultas():
-    if not 'logado' in session:
-        session['logado'] = False
-        return render_template("top.html"), 200
-
-    funcao_menu = 'Consultas Pré-Construídas'
-
-    ds_tipo = req('ds_tipo')
-    ds_campo = str(req('ds_campo')).replace(";","").strip()
-
-    base, sel_base, query = query_builder(ds_tipo, ds_campo)
-    
-    if request.method == 'POST':
-        pd.set_option('display.max_colwidth', -1)
-
-        df = pd.read_csv('bases/bases_oracle.csv',sep=';')
-        conexao = df[(df['base'] == base) & (df['status'] == 1)]['conexao'].to_string(index=False)
-        try:
-            conn_oracle = cx_Oracle.connect(conexao)
-            df_o = pd.read_sql(query, conn_oracle)
-            resultado = df_o
-            tables=[df_o.to_html(classes='rel')]
-
-            logs = tlog(session['matricula'], base + ' ['+ query + ']', dt.datetime.now(), session['ip'])
-            db.session.add(logs)
-
-            return render_template("queries.html", **locals())
-
-        except Exception as e:
-            if str(e).find('password') > 0:
-                df.loc[df['base'] == base, 'status'] = 0
-                df.to_csv('bases/bases_oracle.csv',sep=';',index=False)
-                base, sel_base, query = query_builder(ds_tipo, ds_campo)
-
-            flash(e)
-            return render_template("queries.html", **locals())
-    return render_template("queries.html", sel_base = sel_base, ds_campo = '', funcao_menu = funcao_menu)
+    tree = ET.ElementTree(root)
+    return tree
 
 
 if __name__ == "__main__":
-    db.create_all()
     app.run(debug=True, use_reloader=True,port=5000,host='0.0.0.0')

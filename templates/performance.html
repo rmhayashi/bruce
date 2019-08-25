@@ -1,109 +1,84 @@
 {% extends "top.html" %}
 
 {% block body %}
-<div class="container">
-    <div class="box">
-        <form name="frm" method="post" action="{{ url_for('performance.index') }}">
-            <table>
-                <tr>
-                    <td style="text-align:center">Mês:<br>
-                        <select name="mes" id="mes" required>
-                                <option value="">Selecione o Mês</option>
-                                {{sel_mes|safe}}
-                            </select>
-                    </td>
-                    <td style="text-align:center">Analista:<br>
-                        <select name="matricula" id="matricula" required>
-                                <option value="">Selecione o Mês</option>
-                                {{sel_analista|safe}}
-                            </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="text-align:center" colspan="2">
-                        <input type="submit" name="bt" value="Verificar">
-                    </td>
-                </tr>
-            </table>
-        </form>
-        <br>
-        {% for category, message in get_flashed_messages(with_categories = true) %}
-            <div class="alerta">
-                {{ message }}
-            </div>
-        {% endfor %}
-        
-    </div>
-    
+<div class="row">
+    <form name="frm" method="post" action="{{ url_for('performance.index') }}">
+        <table>
+            <tr>
+                <td style="text-align:right;padding-right: 10px">
+                    <select name="mes" id="mes" style="width:200px;" required>
+                            <option value="">Selecione o Mês</option>
+                            {{sel_mes|safe}}
+                        </select>
+                </td>
+                <td style="text-align:left;padding-left: 10px">
+                    <select name="matricula" id="matricula" style="width:200px;" required>
+                            <option value="">Selecione o Analista</option>
+                            {{sel_analista|safe}}
+                        </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:center" colspan="2">
+                    <input type="submit" name="bt" value="Verificar">
+                </td>
+            </tr>
+        </table>
+    </form>
+    <br>
+    {% for category, message in get_flashed_messages(with_categories = true) %}
+        <div class="alerta">
+            {{ message }}
+        </div>
+    {% endfor %}
 </div>
-<table style="width:92%;">
-    <tr>
-        <td id="grafgeral" style="height:475px;width:50%"></td>
-        <td id="grafatual" style="height:475px;width:50%"></td>
-    </tr>
-    <tr>
-        <td id="graf_retail" style="height:475px;width:50%"></td>
-        <td id="graf_tv" style="height:475px;"></td>
-    </tr>
-    <tr>
-        <td id="graf_bill" style="height:475px;"></td>
-        <td id="graf_corp" style="height:475px;"></td>
-    </tr>
-</table>
+<div class="row">
+    <div class="col-6" id="grafgeral"></div>
+    <div class="col-6" id="grafatual"></div>
+</div>
 
-<table style="width:92%;">
-    <tr>
-        <td id="graf_analista_acumulado" style="height:475px;"></td>
-    </tr>
-    <tr>
-        <td id="graf_analista_mes" style="height:475px;"></td>
-    </tr>
-    <tr>
-        <td id="graf_analista_formulario" style="height:475px;"></td>
-    </tr>
-</table>
 <script>
     var grafgeral = {{grafgeral | safe}};
-    Plotly.plot('grafgeral',grafgeral,{});
-
+    Plotly.newPlot('grafgeral',grafgeral.data,grafgeral.layout,{responsive: true});
+ 
     {% if grafatual %}
         var grafatual = {{grafatual | safe}};
-        Plotly.plot('grafatual',grafatual,{});
+        Plotly.plot('grafatual',grafatual.data,grafatual.layout,{responsive: true});
     {% endif %}
 
     {% if graf_retail %}
         var graf_retail = {{graf_retail | safe}};
-        Plotly.plot('graf_retail',graf_retail,{});
+        Plotly.plot('graf_retail',graf_retail.data,graf_retail.layout,{responsive: true});
     {% endif %}
 
     {% if graf_tv %}
         var graf_tv = {{graf_tv | safe}};
-        Plotly.plot('graf_tv',graf_tv,{});
+        Plotly.plot('graf_tv',graf_tv.data,graf_tv.layout,{responsive: true});
     {% endif %}
 
     {% if graf_bill %}
         var graf_bill = {{graf_bill | safe}};
-        Plotly.plot('graf_bill',graf_bill,{});
+        Plotly.plot('graf_bill',graf_bill.data,graf_bill.layout,{responsive: true});
     {% endif %}
 
     {% if graf_corp %}
         var graf_corp = {{graf_corp | safe}};
-        Plotly.plot('graf_corp',graf_corp,{});
+        Plotly.plot('graf_corp',graf_corp.data,graf_corp.layout,{responsive: true});
     {% endif %}
 
     {% if graf_analista_acumulado %}
         var graf_analista_acumulado = {{graf_analista_acumulado | safe}};
-        Plotly.plot('graf_analista_acumulado',graf_analista_acumulado,{});
+        Plotly.plot('graf_analista_acumulado',graf_analista_acumulado.data,graf_analista_acumulado.layout,{responsive: true});
     {% endif %}
 
     {% if graf_analista_mes %}
         var graf_analista_mes = {{graf_analista_mes | safe}};
-        Plotly.plot('graf_analista_mes',graf_analista_mes,{});
+        Plotly.plot('graf_analista_mes',graf_analista_mes.data,graf_analista_mes.layout,{responsive: true});
     {% endif %}
 
     {% if graf_analista_formulario %}
         var graf_analista_formulario = {{graf_analista_formulario | safe}};
-        Plotly.plot('graf_analista_formulario',graf_analista_formulario,{});
+        Plotly.plot('graf_analista_formulario',graf_analista_formulario.data,graf_analista_formulario.layout,{responsive: true});
     {% endif %}
 </script>
 {% endblock %}

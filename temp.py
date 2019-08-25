@@ -1,21 +1,9 @@
-print('\n\n\n')
-print('********************************')
-print('***Bem vindo ao jogo da forca***')
-print('********************************')
-print('\n\n\n')
+def mdc(a, b):
+    while b:
+        a, b = b, a % b
+    return a
 
-palavra_secreta = 'banana'    
-
-acertou = False
-enforcou = False
-while (not acertou and not enforcou):
-    print('jogando...')
-    chute = input('Qual letra?\n')
-    posicao = 1
-    for letra in palavra_secreta:
-        if (chute.upper() == letra.upper()):
-            print('Encontrei a letra {} na posição {}'.format(letra, posicao))
-        posicao = posicao + 1
-
-print('fim de jogo')
-
+value = input('Digite 2 números separados por vírgula')
+value = value.split(',')
+print(value)
+print(mdc(int(value[0]),int(value[1])))

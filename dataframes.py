@@ -1,10 +1,16 @@
 from classes import *
 
-global df_acumulado, lg_acumulado, ultimo_dia, msg, hoje, nform, lg_escalonados, df_equipe
+# global df_acumulado, lg_acumulado, ultimo_dia, msg, hoje, nform, lg_escalonados, df_equipe
 df_acumulado, lg_acumulado, ultimo_dia, msg, hoje, nform, lg_escalonados, df_equipe = '','','','','','','',''
 
 
 def carrega_bases():
+    sql = 'SELECT * FROM TFECHAMENTO'
+    df_fechamento = pd.read_sql(sql,conn)
+    df_fechamento['mes'] = pd.DatetimeIndex(df_fechamento['dt_cadastro']).month
+    df_fechamento['ano'] = pd.DatetimeIndex(df_fechamento['dt_cadastro']).year
+    df_fechamento['mes_ano'] = df_fechamento['mes'].map(str) + '/' + df_fechamento['ano'].map(str)
+    
     hoje = dt.datetime.now()
     ano = str(hoje.year)
     mes = str(hoje.month)
@@ -16,7 +22,7 @@ def carrega_bases():
 
     nform = pd.read_csv('bases/formularios.csv',sep=';',encoding='cp1252',low_memory=False);
     df_equipe = pd.read_csv('bases/'+ arquivo_equipe,sep=';',encoding='cp1252',low_memory=False);
-    df_equipe = df_equipe.sort_values('nome')
+    df_equipe.sort_values('nome',inplace=True)
     df_acumulado = pd.read_csv('bases/acumulado.csv',sep=';',encoding='utf8',low_memory=False,
                                     names=['persid','incidente','ordem','open_date','resolve_date',
                                         'dia_abertura','dia_fechamento','sla_violation','dt_sla','dia_sla',

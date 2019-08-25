@@ -1,15 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
     <title>Bruce Lee</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='estilos.css') }}">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename=session['estilo']) }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <script type=text/javascript src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
-    <meta name="description" content="Fighting against lazy process">
+
+    <meta name="description" content="Fighting against lazy processes">
     <meta name="author" content="Roger Hayashi e equipe Sonda Curitiba">
+    <meta http-equiv="Content-Language" content="pt-br">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
     {% if not session['logado'] %}
@@ -18,23 +24,17 @@
             window.location.href = "{{ url_for('main') }}";
         </script>
     {% endif %}
-    <table style=" position: fixed; left: 0; top: 0; background-color:black; z-index: 100;">
-        <tr>
-            <td style="text-align:center"><a href="{{ url_for('main') }}">SAIR</a></td>
-            <td style="text-align:center"><a href="{{ url_for('query') }}">QUERY</a></td>
-            <td style="text-align:center"><a href="{{ url_for('consultas') }}">CONSULTAS PRONTAS</a></td>
-            <td style="text-align:center"><a href="{{ url_for('performance.index') }}">PERFORMANCE</a></td>
-            {% if session['matricula'] in ('80656720','80479177') %}
-                <td style="text-align:center"><a href="{{ url_for('novo') }}">USUÁRIOS</a></td>
-                <td style="text-align:center"><a href="{{ url_for('logs') }}">LOGS</a></td>
-            {% endif %}
-            
-        </tr>
-    </table>
-    <br><br><br>
+    <div class="menu" id="dv_menu">
+        <a href="{{ url_for('main') }}">SAIR</a>
+        {{g.menu|safe}}
+        <a class="icon" onclick="open_menu()">
+            <i class="fa fa-bars"></i>
+        </a>
+    </div>
+    <br><br><br><br>
     <table>
         <tr>
-            <td style="text-align:center"><h2>{{funcao_menu}}</h2></td>
+            <td style="text-align:center"><h2>{{funcao_menu}} </h2></td>
         </tr>
     </table>
 {% block body %}{% endblock %}

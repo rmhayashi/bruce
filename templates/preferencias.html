@@ -1,0 +1,59 @@
+{% extends "top.html" %}
+
+{% block body %}
+<script>
+    function changeCSS(tipo){
+        document.frm_css.submit();
+    }
+</script>
+<br><br>
+<!--
+<form name="frm" method="post" action="{{ request.path }}">
+<table style="width:50%">
+    <tr>
+        <td style="width:80px">Senha Atual:</td>
+        <td><input type="password" name="ds_senha" id="ds_senha"></td>
+    </tr>
+    <tr>
+        <td nowrap>Nova Senha:</td>
+        <td>
+            <input type="password" name="nova_senha" id="nova_senha">
+        </td>
+    </tr>
+    <tr>
+        <td nowrap>Confirmar Senha:</td>
+        <td>
+            <input type="password" name="nova_senha2" id="nova_senha2">
+        </td>
+    </tr>
+    <tr>
+            <td colspan="2" style="text-align:center">
+                <input type="submit" name="bt" value="Atualizar">
+            </td>
+        </tr>
+    </table>
+</form>
+-->
+<br><br>
+<form name="frm_css" method="post" action="{{ url_for('retorno.css') }}">
+<table style="width:50%">
+    <tr>
+        <td>Modo:</td>
+        <td>
+            {% if session['estilo'] == 'estilos.css' %}
+                {% set estb = 'checked' %}
+                {% set estw = '' %}
+            {% else %}
+                {% set estb = '' %}
+                {% set estw = 'checked' %}
+            {% endif %}
+            <input type="radio" name="ds_estilo" id="ds_estilob" value="estilos.css" onclick="changeCSS('estilos.css');" {{ estb }}>
+            <label for="ds_estilob">Escuro</label>
+            <input type="radio" name="ds_estilo" id="ds_estilow" value="estilos_white.css" onclick="changeCSS('estilos_white.css');" {{ estw }}>
+            <label for="ds_estilow">Claro</label>
+        </td>
+    </tr>
+</table>    
+</form>
+
+{% endblock %}
