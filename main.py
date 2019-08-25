@@ -65,6 +65,8 @@ def login():
                 session['matricula'] = str(df.DS_LOGIN[0])
                 session['ip'] = request.remote_addr
                 session['estilo'] = str(df['DS_ESTILO'][0])
+                hostname = socket.gethostbyaddr(request.remote_addr)
+                session['hostname'] = hostname[0]
                 sql = "INSERT INTO TLOG (FK_TIPO_LOG, FK_USUARIO_CADASTRO, DS_IP, DS_LOG) VALUES (?,?,?,?)"
                 g.cur.execute (sql,(2,session['id_usuario'],session['ip'], 'Acesso ao sistema'))
                 g.cur.execute('UPDATE TUSUARIO SET DT_ACESSO = NOW() WHERE ID_USUARIO = ?',session['id_usuario'])

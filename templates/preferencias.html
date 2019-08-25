@@ -53,7 +53,17 @@
             <label for="ds_estilow">Claro</label>
         </td>
     </tr>
+    <tr>
+        <td>IP:</td>
+        <td><input type="text" name="ds_ip" id="ds_ip" value="{{ session['ip'] }}" disabled></td>
+    </tr>
+    <tr>
+        <td>Hostname:</td>
+        <td><input type="text" name="ds_ip" id="ds_ip" value="{{ session['hostname'] }}" disabled></td>
+    </tr>
 </table>    
 </form>
+
+
 
 {% endblock %}

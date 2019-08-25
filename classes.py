@@ -15,6 +15,7 @@ import pandas as pd, json
 import plotly, plotly.graph_objs as go
 
 from werkzeug.security import generate_password_hash, check_password_hash
+import socket
 
 from defs import *
 from performance import *
