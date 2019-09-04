@@ -6,36 +6,39 @@
 }
 
 html { 
-	background: url(bruce_white.jpg) no-repeat center fixed; 
+	background: url(bruce.png) center no-repeat fixed; 
+	background-color: white;
 	background-size: cover;
   }
 
 body {
-	color: black;
-	background-color: white;
+	color: #201D1E;
+	background: white;
 	font-size: 14px;
 }
 
 input[type=text], textarea, input[type=password], input[type=email]{
 	width: 99.9%;
-	background-color: #e2e1e1;
 }
 
 input[type=submit],input[type=button]{
-	background-color: black;
-	color: white;
+	background-color: rgba(220, 175, 48);
+	color: black;
 	border-radius: 8px;
-	
+	margin-left: 50vw;
+	margin-top: 2px;
 	min-width: 100px;
 	transition: 0.3s;
+	border:0;
 }
 
 input[type=submit]:hover,input[type=button]:hover {
-	background-color: white;
+	background-color: rgba(220, 175, 48);
 	color: black;
 	cursor: pointer;
 	font-weight: bold;
-	box-shadow: 0 3px 20px 5px rgba(253, 253, 253, 0.2), 0 6px 20px 0 rgba(255, 255, 255, 0.19);
+	box-shadow: 0 2px 30px 5px rgba(255, 187, 0, 0.938), 0 2px 10px 0 rgb(255, 187, 0);
+	border: 0;
   }
 
 .container {
@@ -54,28 +57,47 @@ input[type=submit]:hover,input[type=button]:hover {
 
 .login {
 	width: 400px;
-	background: white;
+	background: #201D1E;
 	justify-content: center;
 	font-size: 20px;
+}
+
+.menu a img{
+    float: left;
+    padding: 0px;
+}
+
+.logo{
+    display: inline-block;
+    height: 30px;
+    width: 100px;
+    padding: 0px;
+}
+.logo a{
+    height: 100%;
 }
 
 .menu {
 	position: fixed; 
 	left: 0; 
 	top: 0; 
-	background-color:white; 
+    background: rgb(255,255,255);
+	background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(224,224,224,1) 0%, rgba(255,255,255,1) 100%);
 	z-index: 100;
 	overflow: hidden;
 	width:100%;
 	text-align: center;
 	display: flex;
 	justify-content: space-between;
-	border-bottom: 3px double #1d1d1d;
+	border-bottom: rgba(220, 175, 48) solid 2px;
+    border-radius: 0 0 10px 0;
+    box-shadow: rgba(220, 175, 48) 0 0 10px;
+    margin-left: 1px;
 }
 
 .menu a {
 	display: inline-block;
-	color: black;
+	color: #201D1E;
 	text-align: center;
 	padding: 4px 6px;
 	text-decoration: none;
@@ -84,14 +106,15 @@ input[type=submit]:hover,input[type=button]:hover {
   }
 
 .menu a:hover {
-	background-color: rgb(26, 26, 26);
-	color: white;
+	color: rgba(220, 175, 48);
+    text-shadow:rgba(220, 175, 48) 1px 1px 1px;
 	cursor: pointer;
 }
 
 .menu a.active {
-	background-color: rgba(220, 175, 48);
-	color: black;
+	color: #201D1E;
+    border-radius: 3px;
+    background-color: rgba(220, 175, 48);
 	cursor: none;
   }
 
@@ -100,6 +123,10 @@ input[type=submit]:hover,input[type=button]:hover {
 }
 
 @media screen and (max-width: 768px) {
+	/* .logo{
+		display:none;
+	} */
+
 	.menu { 
 		text-align: left;
 		display: block;
@@ -116,10 +143,41 @@ input[type=submit]:hover,input[type=button]:hover {
 		right: 0;
 		top: 0;
 	}
+
+	.menu.responsive .icon a:hover{
+		background-color: rgba(220, 175, 48);
+	}
+
+	.menu.responsive{
+		color: rgba(220, 175, 48);
+		border: 2px rgba(220, 175, 48); solid inset;
+    	border-radius: 2px;
+		-webkit-transition: all 0.9s ease;
+		padding: 5px;
+	}
+	
 	.menu.responsive a {
 		float: none;
-		display: block;
+		display: inline-block;
 		text-align: left;
+	}
+
+	.menu.responsive a:not(:first-child){
+    	border-radius: 4px;
+    	padding: 5px;
+    	margin-left: 0;
+    	margin-top: 2px;
+		color: #201D1E;
+    	display: flex;
+    	text-align: left;
+    	text-transform: uppercase;
+	}
+
+	.menu.responsive a:hover:not(:first-child){
+		color: black;
+		text-shadow:black 1px 1px 1px;
+		background: rgba(220, 175, 48);
+		-webkit-transition: all 0.9s ease;
 	}
 }
 
@@ -129,34 +187,91 @@ input[type=submit]:hover,input[type=button]:hover {
 	text-align: center;
 }
 
-table {
-	width: 100%;
-	margin-left:auto; 
-	margin-right:auto;
-	border-spacing: 0px;
-	border-radius: 0px;
+table.rel {
+	border: 1px solid rgba(220, 175, 48);
+  	background-color: #FFFFDD;
+  	width: 100%;
+  	text-align: center;
+  	border-collapse: collapse;
+  	margin-top: 20px;
 }
 
-th {
-	background-color: rgba(220, 175, 48);
-	border: 1px black solid;
-	text-align: center;
-	border-radius: 0px;
+table.rel td, table.tabela th {
+  border: 1px solid #444444;
+  padding: 3px 3px;
 }
 
-.rel td{
-	border: 1px black solid;
-	border-spacing: 0px;
-	padding: 5px;
-	border-radius: 0px;
+table.rel tbody td {
+  font-size: 12px;
+  color: black;
+  max-width: 50px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-.rel tr:nth-child(even){
-	background-color: rgba(220, 175, 48);
+table.rel tr:nth-child(even) {
+  background: rgba(220, 175, 48);
+}
+
+table.rel thead {
+  background: rgb(255, 254, 248);
+  border-bottom: 2px solid #444444;
+  border-top: 2px solid #444444;
+  background: rgba(220, 175, 48);
+}
+
+table.rel thead th {
+  font-size: 12px;
+  font-weight: bold;
+  color: #0A0708;
+  text-align: center;
+  border-left: 2px solid #444444;
+}
+
+table.rel thead th:first-child {
+  border-left: none;
+}
+
+table.rel tfoot {
+  font-size: 12px;
+  font-weight: bold;
+  color: #363636;
+  background: #363636;
+  background: -moz-linear-gradient(top, #686868 0%, #4a4a4a 66%, #363636 100%);
+  background: -webkit-linear-gradient(top, #686868 0%, #4a4a4a 66%, #363636 100%);
+  background: linear-gradient(to bottom, #686868 0%, #4a4a4a 66%, #363636 100%);
+}
+
+table.rel tfoot td {
+  font-size: 12px;
+}
+
+table.rel tfoot .links {
+  text-align: right;
+}
+
+table.rel tfoot .links a{
+  display: inline-block;
+  background: #363633;
+  color: #FFFFFF;
+  padding: 2px 8px;
+  border-radius: 5px;
+}
+
+textarea{
+	width: 98%;
+	margin: 0 1vw;
+	/* box-shadow: 0 1px 15px 2px rgba(0, 0, 0, 0.2), 0 1px 10px 0 rgba(0, 0, 0, 0.19); */
+	background-color: rgba(201, 201, 201, 0.459);
+	margin-bottom: 10px;
+}
+
+select{
+	margin-bottom: 2vh;
 }
 
 a {
-	color: black;
+	color: white;
 	font-size: 14px;
 	text-decoration: none;
 }
@@ -219,7 +334,8 @@ hr {
 	thead tr { 
 		position: absolute;
 		top: -9999px;
-		left: -9999px;
+        left: -9999px;
+    }
 	}
 	/*
 	td { 
@@ -250,4 +366,3 @@ Label the data
 	td:nth-of-type(5):before { content: "Wars of Trek?"; }
 	td:nth-of-type(6):before { content: "Secret Alias"; }
 	td:nth-of-type(7):before { content: "Date of Birth"; }*/
-}	
