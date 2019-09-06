@@ -25,6 +25,7 @@
         </script>
     {% endif %}
     <div class="menu" id="dv_menu">
+        <a href="#"><img class="logo" src="../static/logo.png"></img></a>
         <a href="{{ url_for('main') }}">SAIR</a>
         {{g.menu|safe}}
         <a class="icon" onclick="open_menu()">
