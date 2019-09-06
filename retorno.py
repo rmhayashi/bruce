@@ -96,3 +96,26 @@ def css():
         lista = (exc_type, fname, exc_tb.tb_lineno)
         msg = ' '.join(str(i) for i in lista)
         return '<script>alert("'+ msg +'")</script>'
+
+
+@retorno.route('/plc_soap', methods=['POST','GET'])    
+def plc_soap():
+    id_soap = req('id_soap')
+    df = pd.read_sql('''SELECT DS_SOAP, DS_PARAMETROS FROM TSOAP WHERE ID_SOAP = ?''',g.conn, params=[id_soap])
+    if df.size > 0:
+        msg = df['DS_SOAP'][0]
+        plc = df['DS_PARAMETROS'][0]
+        return '''
+            <script>
+                parent.document.getElementById("dv_ds").innerHTML = "'''+ msg +'''";
+                parent.document.getElementById("ds_parametros").placeholder = "'''+ plc +'''";
+                parent.document.getElementById("ds_parametros").focus();
+            </script>
+            '''
+    else:
+        return '''
+            <script>
+                alert('Erro\n'''+ str(id_soap) +''');
+            </script>
+            '''
+

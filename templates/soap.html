@@ -1,0 +1,54 @@
+{% extends "top.html" %}
+
+{% block body %}
+<script>
+    function plc(id){
+        if (id){
+            opcoes('{{ url_for('retorno.plc_soap') }}','dv',{id_soap:id});
+        }else{
+            document.getElementById("dv_ds").innerHTML = '';
+            document.getElementById("ds_parametros").value = '';
+            document.getElementById("ds_parametros").placeholder = 'Insira o(s) parâmetro(s)';
+        }
+    }
+</script>
+<div id="dv"></div>
+<form name="frm" method="post" action="{{ request.path }}">
+    Selecione o SOAP:
+        <select name="id_soap" id="id_soap" style="width:200px" onchange="plc(this.value)" required autofocus>
+            <option value="">------------</option>
+            {{sel_soap|safe}}
+        </select>
+    <br><br>
+    <div id='dv_ds' style="display:block;height: 25px;color: rgba(220, 175, 48)"></div>
+    <textarea name="ds_parametros" id="ds_parametros" rows="5" placeholder="Insira o(s) parâmetro(s)" required>{{ds_parametros|safe}}</textarea>
+    <br><br>
+    Senha de REDE: <input type="password" name="ds_senha" id="ds_senha" required>
+    <input type="submit" name="btnBuscar" value="Buscar">
+</form>
+<script>
+    plc(document.getElementById('id_soap').value);
+</script>
+<br>
+<br>
+{% for category, message in get_flashed_messages(with_categories = true) %}
+    <p style="color: red;font-weight:bold">Erro: {{ message }}</p>
+{% endfor %}
+
+{% if resultado %}
+    Resultado: <b>{{ resultado }}</b>
+{% endif %}
+
+
+{% if table %}
+    {% for row in table %}
+        {{ row|safe }}
+    {% endfor %}
+{% endif %}
+
+
+{% if html %}
+    {{ html|safe }}
+{% endif %}
+
+{% endblock %}

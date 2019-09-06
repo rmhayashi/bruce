@@ -2,8 +2,13 @@ from classes import *
 
 @app.before_request
 def before_request():
+    session.permanent = True
+    app.permanent_session_lifetime = dt.timedelta(minutes=30)
     g.conn = conn
     g.cur = conn.cursor()
+
+    # g.con_remedy = con_remedy
+
     if 'logado' not in session:
         g.menu = None
         if request.endpoint not in ('login','main','static'):
@@ -12,8 +17,6 @@ def before_request():
     else:
         g.menu = monta_menu()
 
-# @app.context_processor
-# def context_processor():
 
 @app.route("/")
 def main():
@@ -66,7 +69,7 @@ def login():
                 session['ip'] = request.remote_addr
                 session['estilo'] = str(df['DS_ESTILO'][0])
                 hostname = socket.gethostbyaddr(request.remote_addr)
-                session['hostname'] = hostname[0]
+                session['hostname'] = hostname[0].upper().replace('.REDECORP.BR','').replace('.GVT.NET.BR','')
                 sql = "INSERT INTO TLOG (FK_TIPO_LOG, FK_USUARIO_CADASTRO, DS_IP, DS_LOG) VALUES (?,?,?,?)"
                 g.cur.execute (sql,(2,session['id_usuario'],session['ip'], 'Acesso ao sistema'))
                 g.cur.execute('UPDATE TUSUARIO SET DT_ACESSO = NOW() WHERE ID_USUARIO = ?',session['id_usuario'])
@@ -102,20 +105,6 @@ def logs():
         table = [table.to_html(classes='rel',index=False)]
         
     return render_template('logs.html',**locals())
-
-
-@app.route("/xml",methods=['GET', 'POST'])
-def xml():
-    import xml.etree.cElementTree as ET
-
-    root = ET.Element("root")
-    doc = ET.SubElement(root, "doc")
-
-    ET.SubElement(doc, "field1", name="blah").text = "some value1"
-    ET.SubElement(doc, "field2", name="asdfasd").text = "some vlaue2"
-
-    tree = ET.ElementTree(root)
-    return tree
 
 
 if __name__ == "__main__":
