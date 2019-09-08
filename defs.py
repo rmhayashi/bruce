@@ -25,7 +25,7 @@ def monta_menu():
         else:
             cl = ''
         html += '''
-            <a class="'''+ cl +'''" href="''' + url_for(x['OB_TIPO2']) +'''">''' + x['DS_TIPO'] + '''</a>'''
+            <li><a class="'''+ cl +'''" href="''' + url_for(x['OB_TIPO2']) +'''">''' + x['DS_TIPO'] + '''</a><li>'''
     return html
 
 
