@@ -34,7 +34,8 @@ input[type=text],
 textarea,
 input[type=password],
 input[type=email] {
-	width: 95%;
+	color: white;
+	width: 99.9%;
 	background-color: rgba(253, 253, 252, 0.2);
 }
 
