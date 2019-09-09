@@ -13,7 +13,7 @@ html {
 
 body {
 	color: black;
-	background-color: transparent;
+	background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(224,224,224,1) 0%, rgba(255,255,255,1) 100%);
 	font-size: 14px;
 }
 
