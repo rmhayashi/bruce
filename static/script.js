@@ -15,12 +15,12 @@ function filtra(col,vl) {
   }
 }
 
-function opcoes(pg,dv,data){
+function opcoes(pg, dv, data) {
   $.ajax({
-    url:pg, 
-    type:'post', 
-    data:data, 
-    success: function(retorno){
+    url: pg,
+    type: 'post',
+    data: data,
+    success: function (retorno) {
       $("#" + dv).html(retorno);
     }//,
     // beforeSend : function(){
@@ -29,12 +29,38 @@ function opcoes(pg,dv,data){
   })
 }
 
+function close_menu() {
+  let x = $("#dv_menu")
+  let s = $("#exit")
+  let l = $("#logo")
 
-function open_menu() {
-  var x = document.getElementById("dv_menu");
-  if (x.className === "menu") {
-    x.className += " responsive";
-  } else {
-    x.className = "menu";
+  if (x.hasClass("responsive")) {
+    x.removeClass("responsive")
+    s.show("slow")
+    l.show("fast")
   }
 }
+
+function open_menu() {
+  let x = document.getElementById("dv_menu");
+  let s = $("#exit");
+  let l = $("#logo");
+
+  if (x.className === "menu") {
+    x.className += " responsive";
+    s.hide("fast")
+    l.hide("fast")
+  } else {
+    x.className = "menu";
+    s.show("slow")
+    l.show("fast")
+  }
+}
+
+$("#icon-bar").click(() => {
+  open_menu()
+})
+
+$(window).resize(() => {
+  close_menu()
+})

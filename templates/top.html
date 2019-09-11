@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <title>Bruce Lee</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -17,28 +18,34 @@
     <meta http-equiv="Content-Language" content="pt-br">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
+
 <body>
     {% if not session['logado'] %}
-        <script>
-            alert("Sessão Expirada!");
-            window.location.href = "{{ url_for('main') }}";
-        </script>
+    <script>
+        alert("Sessão Expirada!");
+        window.location.href = "{{ url_for('main') }}";
+    </script>
     {% endif %}
     <div class="menu" id="dv_menu">
-        <a href="#"><img class="logo" src="../static/logo.png"></img></a>
-        <a href="{{ url_for('main') }}">SAIR</a>
-        {{g.menu|safe}}
-        <a class="icon" onclick="open_menu()">
-            <i class="fa fa-bars"></i>
-        </a>
+        <img src="../static/logo.png" class="logo" id="logo"></img>
+        <ul class="nav_links">
+            {{g.menu|safe}}
+            <a class="icon" id="icon-bar" title="Menu" open_menu>
+                <i class="fa fa-bars"></i>
+            </a>
+        </ul>
+        <a id="exit" href="{{ url_for('main') }}" title="Logoff"><button class="fa fa-close"></button></a>
     </div>
     <br><br><br><br>
     <table>
         <tr>
-            <td style="text-align:center"><h2>{{funcao_menu}} </h2></td>
+            <td style="text-align:center">
+                <h2>{{funcao_menu}} </h2>
+            </td>
         </tr>
     </table>
-{% block body %}{% endblock %}
-<br><br>
+    {% block body %}{% endblock %}
+    <br><br>
 </body>
+
 </html>
