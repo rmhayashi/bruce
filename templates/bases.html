@@ -1,0 +1,101 @@
+{% extends "top.html" %}
+
+{% block body %}
+<script>
+    function compara_senha(){
+        s1 = document.getElementById('ds_pass').value;
+        s2 = document.getElementById('ds_pass2').value;
+        if (s1 != s2){
+            alert('Confirmação de senha não confere!');
+            document.getElementById('ds_pass').value = '';
+            document.getElementById('ds_pass2').value = '';
+            document.getElementById('ds_pass').focus();
+        }
+    }
+
+    function edit_base(id){
+        document.frm_base.id_base.value = id;
+        document.frm_base.submit()
+    }
+</script>
+<form name="frm" method="post" action="{{ request.path }}">
+<div class="col-3">Base:
+    <input type="text" name="no_base" id="no_base" required autofocus>
+</div>
+<div class="col-3">Usuário:
+    <input type="text" name="ds_user" id="ds_user" required>
+</div>
+
+<div class="col-3">Senha:
+    <input type="password" name="ds_pass" id="ds_pass" required>
+</div>
+<div class="col-3">Confirma Senha:
+    <input type="password" name="ds_pass2" id="ds_pass2" required onblur="compara_senha()">
+</div>
+
+
+<div class="col-2">Host:
+    <input type="text" name="ds_host" id="ds_host" required>
+</div>
+<div class="col-2">Porta:
+    <input type="number" name="ds_port" id="ds_port" value="1521" required>
+</div>
+<div class="col-2">Serviço ou SID:
+    <input type="text" name="no_service" id="no_service" required>
+</div>
+<div class="col-1">&nbsp;</div>
+<div class="col-5">Tipo:<br>
+    <input type="radio" name="tp_service" id="tp_serviceh" value="HOST">
+    <label for="tp_serviceh">HOST</label>
+    <input type="radio" name="tp_service" id="tp_services" value="SID">
+    <label for="tp_services">SID</label>
+</div>
+<div class="col-12" style="text-align:center">&nbsp;</div>
+<div class="col-12" style="text-align:center">
+    <input type="submit" name="bt" value="CADASTRAR">
+</div>
+</form>
+<div class="col-12" style="text-align:center">&nbsp;<br></div>
+{% for category, message in get_flashed_messages(with_categories = true) %}
+    <div class="alerta">
+        {{ message }}
+    </div>
+{% endfor %}
+<table class="rel" id="tbfiltro" style="width:99%">
+    <thead>
+        <tr>
+            <th>Base</th>
+            <th style="width: 15%">Usuário</th>
+            <th style="width: 12%">Host</th>
+            <th style="width: 5%">Porta</th>
+            <th style="width: 15%">Service</th>
+            <th style="width: 10%">Status</th>
+            <th style="width: 7%">Editar</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        
+        {% for x in table %}
+            <tr>
+                <td>{{ x['NO_BASE'] }}</td>
+                <td>{{ x['DS_USER'] }}</td>
+                <td style="text-align:center;">{{ x['DS_HOST'] }}&nbsp;</td>
+                <td style="text-align:center;">{{ x['DS_PORT'] }}</td>
+                <td style="text-align:center;">{{ x['NO_SERVICE'] }}</td>
+                <td style="text-align:center;">
+                    {% if x['FL_ATIVO'] == 1 %}
+                        ATIVO
+                    {% else %}
+                        BLOQUEADO
+                    {% endif %}
+                </td>
+                <td style="text-align:center;color:red;font-size:12px;cursor:pointer;" title="Editar Base {{ x['NO_BASE'] }}" onclick="edit_base({{ x['ID_BASE'] }});">&Delta;</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<form name="frm_base" method="POST" action="{{ url_for('bases.detalhe') }}">
+    <input type="hidden" name="id_base">
+</form>
+{% endblock %}

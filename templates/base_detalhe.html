@@ -1,0 +1,75 @@
+{% extends "top.html" %}
+
+{% block body %}
+
+<script>
+    function compara_senha(){
+        s1 = document.getElementById('ds_pass').value;
+        s2 = document.getElementById('ds_pass2').value;
+        if (s1 != s2){
+            alert('Confirmação de senha não confere!');
+            document.getElementById('ds_pass').value = '';
+            document.getElementById('ds_pass2').value = '';
+            document.getElementById('ds_pass').focus();
+        }
+    }
+</script>
+
+{% for category, message in get_flashed_messages(with_categories = true) %}
+    <div class="alerta">
+        {{ message }}
+    </div>
+{% endfor %}
+<br><br>
+<form name="frm" method="post" action="{{ url_for('bases.atu_base') }}">
+<div class="col-3">Base:
+    <input type="text" name="no_base" id="no_base" value="{{ no_base }}" readonly>
+</div>
+<div class="col-3">Usuário:
+    <input type="text" name="ds_user" id="ds_user" value="{{ ds_user }}" required>
+</div>
+
+<div class="col-3">Senha:
+    <input type="password" name="ds_pass" id="ds_pass" value="{{ ds_pass }}" required>
+</div>
+<div class="col-3">Confirma Senha:
+    <input type="password" name="ds_pass2" id="ds_pass2" value="{{ ds_pass }}" required onblur="compara_senha()">
+</div>
+
+
+<div class="col-2">Host:
+    <input type="text" name="ds_host" id="ds_host" value="{{ ds_host }}" required>
+</div>
+<div class="col-2">Porta:
+    <input type="number" name="ds_port" id="ds_port" value="{{ ds_port }}" required>
+</div>
+<div class="col-2">Serviço ou SID:
+    <input type="text" name="no_service" id="no_service" value="{{ no_service }}" required>
+</div>
+<div class="col-1">&nbsp;</div>
+<div class="col-3">Tipo:<br>
+    <input type="radio" name="tp_service" id="tp_serviceh" value="HOST" {% if tp_service == "HOST" %}checked{% endif %}>
+    <label for="tp_serviceh">HOST</label>
+    <input type="radio" name="tp_service" id="tp_services" value="SID" {% if tp_service == "SID" %}checked{% endif %}>
+    <label for="tp_services">SID</label>
+</div>
+
+<div class="col-2">Tipo:<br>
+    <input type="radio" name="fl_ativo" id="fl_ativo1" value="1" {% if fl_ativo == 1 %}checked{% endif %}>
+    <label for="fl_ativo1">Ativa</label>
+    <input type="radio" name="fl_ativo" id="fl_ativo0" value="0" {% if fl_ativo == 0 %}checked{% endif %}>
+    <label for="fl_ativo0">Bloqueada</label>
+</div>
+<div class="col-12" style="text-align:center"><br><br></div>
+
+
+<div class="col-12" style="text-align:center"><br><br></div>
+<div class="col-12" style="text-align:center">
+    <input type="hidden" name="id_base" value="{{ id_base }}">
+    <input type="submit" name="bt" value="ATUALIZAR">
+    &nbsp;&nbsp;&nbsp;
+    <input type="button" name="bt" value="VOLTAR" onclick="window.location.href = '{{ url_for('bases.index') }}'">
+</div>
+</form>
+
+{% endblock %}

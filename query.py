@@ -6,24 +6,30 @@ query = Blueprint('query', __name__,url_prefix="/")
 def index():
     funcao_menu = 'Consultas Construídas pelo Usuário'
 
-    ds_base = req("ds_base")
+    id_base = req("id_base")
     
     def monta_base():
         sel = ''
         sel_base = ''
         conexao = ''
-        df = pd.read_sql('''SELECT DISTINCT BASE, CONEXAO, STATUS FROM BASES_ORACLE WHERE STATUS = 1 ORDER BY BASE''', g.conn)
+        ds_base = ''
+        df = pd.read_sql('''SELECT ID_BASE, NO_BASE, DS_STR 
+            FROM TBASES 
+            WHERE FL_ATIVO = 1 
+                AND TP_SERVICE = 'HOST' 
+            ORDER BY NO_BASE''', g.conn)
         
-        for x, y in df[['BASE','CONEXAO']].values:
-            if ds_base == x:
+        for x, y, z in df[['ID_BASE', 'NO_BASE', 'DS_STR']].values:
+            if str(id_base) == str(x):
                 sel = 'selected'
-                conexao = y
+                conexao = z
+                ds_base = y
             else:
                 sel = ''
-            sel_base += '<option value="'+ x +'" '+ sel +'>'+ x +'</option>'
-        return sel_base, df, conexao
+            sel_base += '<option value="'+ str(x) +'" '+ sel +'>'+ y +'</option>'
+        return sel_base, conexao, ds_base
 
-    sel_base, df, conexao = monta_base()
+    sel_base, conexao, ds_base = monta_base()
 
     if request.method == 'POST':
         query = str(req("query")).replace(";","").strip()
@@ -50,11 +56,11 @@ def index():
                 g.cur.execute (sql,(13,session['id_usuario'],session['ip'], query +' - '+ str(e)))
 
                 if str(e).find('password') > 0:
-                    g.cur.execute('UPDATE BASES_ORACLE SET STATUS = 0 WHERE BASE = ?', ds_base)
+                    g.cur.execute('UPDATE TBASES SET FL_ATIVO = 0 WHERE ID_BASE = ?', id_base)
                     g.cur.execute (sql,(4,session['id_usuario'],session['ip'], 'Inativação de Logon Oracle - Base '+ ds_base))
                 
-                flash(e)
-                sel_base, df, conexao = monta_base()
+                flash(str(e))
+                sel_base, conexao, ds_base = monta_base()
                 return render_template("query.html", **locals())
 
     return render_template("query.html", **locals())

@@ -28,22 +28,12 @@ from query import *
 from consultas import *
 from preferencias import *
 from soap import *
+from bases import *
 
 
 db_file = os.path.dirname(os.path.abspath("bruce.ipynb")) +"\\bases\\bruce.accdb"
 odbc_conn_str = 'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=' + db_file
 conn = pyodbc.connect(odbc_conn_str,autocommit=True,timeout=1)
-
-# df = pd.read_sql('''SELECT NO_BASE, DS_USER, DS_PASS, DS_DNS, DS_STR 
-#     FROM TBASES WHERE NO_BASE = 'REMEDY' ''',conn)
-
-# dns = df['DS_DNS'][0].split(',')
-# senha = df['DS_PASS'][0]
-# usuario = df['DS_USER'][0]
-
-# dsnStr = cx_Oracle.makedsn(dns[0],dns[1],dns[2]) 
-# con_remedy = cx_Oracle.connect(user=usuario, password=senha, dsn=dsnStr)
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'hashsometHingthatcantberepliedneVer'
@@ -55,3 +45,4 @@ app.register_blueprint(query)
 app.register_blueprint(consultas)
 app.register_blueprint(preferencias)
 app.register_blueprint(soap)
+app.register_blueprint(bases)

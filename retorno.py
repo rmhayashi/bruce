@@ -54,29 +54,39 @@ def excluir_login():
 
 @retorno.route('/atu_acesso',methods=['POST','GET'])
 def atu_acesso():
-    try:
-        id_usuario = req('id_usuario')
-        id_tipo = reqls('id_tipo')
+    # try:
+    id_usuario = req('id_usuario')
+    id_tipo = reqls('id_tipo')
 
-        g.cur.execute('DELETE FROM TUSUARIO_ACESSO WHERE FK_USUARIO = ?', id_usuario)
-        for x in id_tipo:
-            g.cur.execute('''
-                INSERT INTO TUSUARIO_ACESSO (FK_USUARIO, FK_TIPO_ACESSO, FK_USUARIO_CADASTRO)
-                VALUES (?, ?, ?)''', (id_usuario, x, session['id_usuario']))
-        
-        flash('Dados Atualizados com Sucesso!')
+    # ds_login = req('ds_login')
+    no_usuario = req('no_usuario')
+    ds_email = req('ds_email')
+    fl_ativo = req('fl_ativo')
+    ds_host = req('ds_host')
 
-        return '''
-                <script>
-                    parent.window.location.href = "'''+ url_for('usuarios.index') +'''";
-                </script>
-                '''
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        lista = (exc_type, fname, exc_tb.tb_lineno)
-        msg = ' '.join(str(i) for i in lista)
-        return '<script>alert("'+ msg +'")</script>'
+    g.cur.execute('''UPDATE TUSUARIO SET NO_USUARIO = ?, DS_EMAIL = ?, FL_ATIVO = ?, DS_HOST = ?
+        WHERE ID_USUARIO = ?
+        ''',(no_usuario,ds_email,fl_ativo,ds_host,id_usuario))
+
+    g.cur.execute('DELETE FROM TUSUARIO_ACESSO WHERE FK_USUARIO = ?', id_usuario)
+    for x in id_tipo:
+        g.cur.execute('''
+            INSERT INTO TUSUARIO_ACESSO (FK_USUARIO, FK_TIPO_ACESSO, FK_USUARIO_CADASTRO)
+            VALUES (?, ?, ?)''', (id_usuario, x, session['id_usuario']))
+    
+    flash('Dados Atualizados com Sucesso!')
+
+    return '''
+            <script>
+                parent.window.location.href = "'''+ url_for('usuarios.index') +'''";
+            </script>
+            '''
+    # except Exception as e:
+    #     exc_type, exc_obj, exc_tb = sys.exc_info()
+    #     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    #     lista = (exc_type, fname, exc_tb.tb_lineno)
+    #     msg = ' '.join(str(i) for i in lista)
+    #     return '<script>alert("'+ msg +'");parent.window.history.back();</script>'
 
 
 @retorno.route('/css', methods=['POST','GET'])    

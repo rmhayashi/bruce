@@ -9,6 +9,28 @@
 {% endfor %}
 <br><br>
 <form name="frm" method="post" action="{{ url_for('retorno.atu_acesso') }}">
+<div class="col-2">Login:
+    <input type="text" name="ds_login" id="ds_login" value="{{ ds_login }}" readonly>
+</div>
+<div class="col-10">Nome:
+    <input type="text" name="no_usuario" id="no_usuario" value="{{ no_usuario }}" required>
+</div>
+
+<div class="col-4">E-mail:
+    <input type="text" name="ds_email" id="ds_email" value="{{ ds_email }}" required>
+</div>
+<div class="col-2">Hostname:
+    <input type="text" name="ds_host" id="ds_host" value="{{ ds_host }}" required>
+</div>
+<div class="col-1">&nbsp;</div>
+<div class="col-5">Status:<br>
+    <input type="radio" name="fl_ativo" id="fl_ativo1" value="1" {% if fl_ativo == 1 %}checked{% endif %}>
+    <label for="fl_ativo1">Ativo</label>
+    <input type="radio" name="fl_ativo" id="fl_ativo0" value="0" {% if fl_ativo == 0 %}checked{% endif %}>
+    <label for="fl_ativo0">Bloqueado</label>
+</div>
+<div class="col-12" style="text-align:center"><br><br></div>
+
 {% for key, x in df.iterrows() %}
     {% if x['ID_USUARIO_ACESSO']|string != 'nan' %}
         {% set check = 'checked' %}
@@ -20,7 +42,8 @@
         <label for="{{ x['ID_TIPO'] }}">{{ x['DS_TIPO'] }}</label>
     </div>
 {% endfor %}
-<br><br><br><br>
+
+<div class="col-12" style="text-align:center"><br><br></div>
 <div class="col-12" style="text-align:center">
     <input type="hidden" name="id_usuario" value="{{ id_usuario }}">
     <input type="submit" name="bt" value="ATUALIZAR">
