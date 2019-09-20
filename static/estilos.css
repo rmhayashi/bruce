@@ -16,7 +16,7 @@ body {
 	font-size: 14px;
 }
 
-input[type=text], textarea, input[type=password], input[type=email]{
+input[type=text], textarea, input[type=password], input[type=email], input[type=number]{
 	width: 99.9%;
 }
 

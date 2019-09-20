@@ -36,8 +36,12 @@ def query_builder(ds_tipo,ds_campo):
     query = ''
 
     df = pd.read_csv('bases/consultas.csv',sep=';')
-    df2 = pd.read_sql('''SELECT DISTINCT BASE, CONEXAO, STATUS FROM BASES_ORACLE WHERE STATUS = 1 ORDER BY BASE''', g.conn)
-    df = df[df['base'].isin(df2['BASE'])].sort_values(by = ['base','tipo'])
+    df2 = pd.read_sql('''SELECT ID_BASE, NO_BASE, DS_STR 
+        FROM TBASES 
+        WHERE FL_ATIVO = 1 
+            AND TP_SERVICE = 'HOST' 
+        ORDER BY NO_BASE''', g.conn)
+    df = df[df['base'].isin(df2['NO_BASE'])].sort_values(by = ['base','tipo'])
     # df = df.sort_values(by = ['base'])
     for x in df['base'].unique():
         sel_base += '<optgroup label="'+ x +'" style="background-color:silver">'

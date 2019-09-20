@@ -111,37 +111,44 @@ def excecao_savvion(incidente,ordem):
     return df[['INCIDENTE', 'ORDEM', 'PROCESSO', 'ATIVIDADE', 'BASE']]
 
 def soap_execute_bypass(incidente,ordem,atividade,senha):
-    url="http://sv2kpint1:7001/IT_Suporte_Integracao_WS_v2/SavvionBaOnlineService?wsdl"
-    headers = {'content-type': 'text/xml;charset=iso-8859-1'}
-    body = '''
-        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.itss.gvt.com/">
-        <soapenv:Header/>
-        <soapenv:Body>
-            <ws:byPassAtividade>
-                <pon>{}</pon>
-                <atividade>{}</atividade>
-                <savvion>baonline</savvion>
-                <incidente>{}</incidente>
-                <maquina>{}</maquina>
-                <usuario>{}</usuario>
-                <senha>{}</senha>
-            </ws:byPassAtividade>
-        </soapenv:Body>
-        </soapenv:Envelope>
-    '''
-    body = body.format(ordem, atividade, incidente, 'NPRCURJBR7028TX', '80514494', 'c0uv3fl*r')
-    # body = body.format(ordem, atividade, incidente, session['hostname'], session['matricula'], senha)
+    try:
+        url="http://sv2kpint1:7001/IT_Suporte_Integracao_WS_v2/SavvionBaOnlineService"
+        headers = {'content-type': 'text/xml;charset=iso-8859-1'}
+        body = '''
+            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.itss.gvt.com/">
+            <soapenv:Header/>
+            <soapenv:Body>
+                <ws:byPassAtividade>
+                    <userManagement>
+                        <username>{}</username>
+                        <password>{}</password>
+                    </userManagement>
+                    <maquina>{}</maquina>
+                    <pon>{}</pon>
+                    <atividade>{}</atividade>
+                    <savvion>baonline</savvion>
+                    <incidente>{}</incidente>
+                </ws:byPassAtividade>
+            </soapenv:Body>
+            </soapenv:Envelope>
+        '''
+        body = body.format(session['matricula'], senha, session['hostname'], ordem, atividade, incidente)
 
-    xml_file = requests.post(url,data=body,headers=headers)
-    tree = ET.fromstring(xml_file.content)
-    root = tree.find('.//{http://schemas.xmlsoap.org/soap/envelope/}Body').find('.//{http://ws.itss.gvt.com/}byPassAtividadeResponse').find('Resultado')
+        xml_file = requests.post(url,data=body,headers=headers)
+        tree = ET.fromstring(xml_file.content)
+        root = tree.find('.//{http://schemas.xmlsoap.org/soap/envelope/}Body').find('.//{http://ws.itss.gvt.com/}byPassAtividadeResponse').find('Resultado')
 
-    codigo, mensagem = root.find('codigo').text, root.find('mensagem').text
+        codigo, mensagem = root.find('codigo').text, root.find('mensagem').text
 
-    log = body + ' | '+ mensagem
+        log = body + ' | '+ mensagem
 
-    sql = "INSERT INTO TLOG (FK_TIPO_LOG, FK_USUARIO_CADASTRO, DS_IP, DS_LOG) VALUES (?,?,?,?)"
-    g.cur.execute (sql,(15,session['id_usuario'],session['ip'], log))
+        sql = "INSERT INTO TLOG (FK_TIPO_LOG, FK_USUARIO_CADASTRO, DS_IP, DS_LOG) VALUES (?,?,?,?)"
+        g.cur.execute (sql,(15,session['id_usuario'],session['ip'], log))
+    
+    except Exception as e:
+        flash(xml_file)
+        codigo = 500
+        mensagem = str(e)
 
     return codigo, mensagem
 
@@ -227,37 +234,42 @@ def soap_bypass(incidente,ordem,senha):
 
 ############################################## REEXECUTAR SAVVION ####################################################
 def soap_reexecute_savvion(incidente,ordem,atividade,senha):
-    url="http://sv2kpint1:7001/IT_Suporte_Integracao_WS_v2/SavvionBaOnlineService?wsdl"
-    headers = {'content-type': 'text/xml;charset=iso-8859-1'}
-    body = '''
-        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.itss.gvt.com/">
-        <soapenv:Header/>
-        <soapenv:Body>
-            <ws:reexecutarExcecao>
-                <pon>{}</pon>
-                <atividade>{}</atividade>
-                <savvion>baonline</savvion>
-                <incidente>{}</incidente>
-                <maquina>{}</maquina>
-                <usuario>{}</usuario>
-                <senha>{}</senha>
-            </ws:reexecutarExcecao>
-        </soapenv:Body>
-        </soapenv:Envelope>
-    '''
-    body = body.format(ordem, atividade, incidente, 'NPRCURJBR7028TX', '80514494', 'c0uv3fl*r')
-    # body = body.format(ordem, atividade, incidente, session['hostname'], session['matricula'], senha)
+    try:
+        url="http://sv2kpint1:7001/IT_Suporte_Integracao_WS_v2/SavvionBaOnlineService"
+        headers = {'content-type': 'text/xml;charset=iso-8859-1'}
+        body = '''
+            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.itss.gvt.com/">
+            <soapenv:Header/>
+            <soapenv:Body>
+                <ws:reexecutarExcecao>
+                    <pon>{}</pon>
+                    <atividade>{}</atividade>
+                    <savvion>baonline</savvion>
+                    <incidente>{}</incidente>
+                    <maquina>{}</maquina>
+                    <usuario>{}</usuario>
+                    <senha>{}</senha>
+                </ws:reexecutarExcecao>
+            </soapenv:Body>
+            </soapenv:Envelope>
+        '''
+        # body = body.format(ordem, atividade, incidente, 'NPRCURJBR7028TX', '80514494', 'c0uv3fl*r')
+        body = body.format(ordem, atividade, incidente, session['hostname'], session['matricula'], senha)
 
-    xml_file = requests.post(url,data=body,headers=headers)
-    tree = ET.fromstring(xml_file.content)
-    root = tree.find('.//{http://schemas.xmlsoap.org/soap/envelope/}Body').find('.//{http://ws.itss.gvt.com/}reexecutarExcecaoResponse').find('Resultado')
+        xml_file = requests.post(url,data=body,headers=headers)
+        tree = ET.fromstring(xml_file.content)
+        root = tree.find('.//{http://schemas.xmlsoap.org/soap/envelope/}Body').find('.//{http://ws.itss.gvt.com/}reexecutarExcecaoResponse').find('Resultado')
 
-    codigo, mensagem = root.find('codigo').text, root.find('mensagem').text
+        codigo, mensagem = root.find('codigo').text, root.find('mensagem').text
 
-    log = body + ' | '+ mensagem
+        log = body + ' | '+ mensagem
 
-    sql = "INSERT INTO TLOG (FK_TIPO_LOG, FK_USUARIO_CADASTRO, DS_IP, DS_LOG) VALUES (?,?,?,?)"
-    g.cur.execute (sql,(15,session['id_usuario'],session['ip'], log))
+        sql = "INSERT INTO TLOG (FK_TIPO_LOG, FK_USUARIO_CADASTRO, DS_IP, DS_LOG) VALUES (?,?,?,?)"
+        g.cur.execute (sql,(15,session['id_usuario'],session['ip'], log))
+
+    except Exception as e:
+        codigo = 500
+        mensagem = str(e)
 
     return codigo, mensagem
 
@@ -397,40 +409,46 @@ def excecao_billing(incidente,ordem):
         
     return df[['INCIDENTE', 'ORDEM', 'PROCESSO','ATIVIDADE', 'BASE']]
 
-def soap_reexecuta_bill(incidente,ordem,atividade,senha):
-    url="http://sv2kpint1:7001/IT_Suporte_Integracao_WS_v2/SavvionBillingNSService?wsdl"
-    headers = {'content-type': 'text/xml;charset=iso-8859-1'}
-    body = '''    
-        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.itss.gvt.com/">
-        <soapenv:Header/>
-        <soapenv:Body>
-            <ws:reexecutarExcecao>
-             <pon>{}</pon>
-             <atividade>{}</atividade>
-             <excecao></excecao>  <!--Optional:-->
-             <savvion>billing</savvion>
-             <incidente>{}</incidente>
-             <maquina>{}</maquina>
-             <usuario>{}</usuario>
-             <senha>{}</senha>
-            </ws:reexecutarExcecao>
-        </soapenv:Body>
-        </soapenv:Envelope>
-        '''
-    body = body.format(ordem, atividade, incidente, 'NPRCURJBR7028TX', '80514494', 'c0uv3fl*r')
-    # body = body.format(ordem, atividade, incidente, session['hostname'], session['matricula'], senha)
+def soap_reexecuta_bill(incidente,ordem,atividade,excecao,senha):
+    try:
+        url="http://sv2kpint1:7001/IT_Suporte_Integracao_WS_v2/SavvionBillingNSService"
+        headers = {'content-type': 'text/xml;charset=iso-8859-1'}
+        body = '''    
+            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.itss.gvt.com/">
+            <soapenv:Header/>
+            <soapenv:Body>
+                <ws:reexecutarExcecao>
+                    <userManagement>
+                        <username>{}</username>
+                        <password>{}</password>
+                    </userManagement>
+                    <maquina>{}</maquina>
+                    <pon>{}</pon>
+                    <atividade>{}</atividade>
+                    <excecao>{}</excecao>
+                    <savvion>billing</savvion>
+                    <incidente>{}</incidente>
+                </ws:reexecutarExcecao>
+            </soapenv:Body>
+            </soapenv:Envelope>
+            '''
+        body = body.format(session['matricula'], senha, session['hostname'], ordem, atividade, excecao, incidente)
 
-    xml_file = requests.post(url,data=body,headers=headers)
-    tree = ET.fromstring(xml_file.content)
-    
-    root = tree.find('.//{http://schemas.xmlsoap.org/soap/envelope/}Body').find('.//{http://ws.itss.gvt.com/}reexecutarExcecaoResponse').find('Resultado')
-    
-    codigo, mensagem = root.find('codigo').text, root.find('mensagem').text
-    
-    log = body + ' | '+ mensagem
+        xml_file = requests.post(url,data=body,headers=headers)
+        tree = ET.fromstring(xml_file.content)
+        
+        root = tree.find('.//{http://schemas.xmlsoap.org/soap/envelope/}Body').find('.//{http://ws.itss.gvt.com/}reexecutarExcecaoResponse').find('Resultado')
+        
+        codigo, mensagem = root.find('codigo').text, root.find('mensagem').text
+        
+        log = body + ' | '+ mensagem
 
-    sql = "INSERT INTO TLOG (FK_TIPO_LOG, FK_USUARIO_CADASTRO, DS_IP, DS_LOG) VALUES (?,?,?,?)"
-    g.cur.execute (sql,(17,session['id_usuario'],session['ip'], log))
+        sql = "INSERT INTO TLOG (FK_TIPO_LOG, FK_USUARIO_CADASTRO, DS_IP, DS_LOG) VALUES (?,?,?,?)"
+        g.cur.execute (sql,(17,session['id_usuario'],session['ip'], log))
+        
+    except Exception as e:
+        codigo = 500
+        mensagem = str(e)
 
     return codigo, mensagem
 
@@ -444,7 +462,8 @@ def soap_billing(incidente,ordem,senha):
         flash('Ordem '+ ordem +' sem Exceção!')
     
     elif df.size == 5:
-        codigo, mensagem = soap_reexecuta_bill(incidente,ordem,df['ATIVIDADE'][0],senha)
+        excecao = df['ATIVIDADE'][0]
+        codigo, mensagem = soap_reexecuta_bill(incidente,ordem,df['ATIVIDADE'][0],excecao,senha)
             
         if mensagem == 'Erro ao realizar complete work item':
             flash('Senha de rede inválida!')
